@@ -321,6 +321,30 @@ void ARSCharacter::EnableGhost(bool bEnable)
 	}
 }
 
+float ARSCharacter::PlayAnimMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate, FName StartSectionName)
+{
+	UAnimInstance * AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
+	if( AnimMontage && AnimInstance )
+	{
+		float const Duration = AnimInstance->Montage_Play(AnimMontage, InPlayRate);
+
+		if (Duration > 0.f)
+		{
+			if( StartSectionName != NAME_None )
+			{
+				AnimInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
+			}
+
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindLambda( EndCallback);
+			AnimInstance->Montage_SetEndDelegate(EndDelegate, AnimMontage);
+			return Duration;
+		}
+	}	
+
+	return 0.f;
+}
+
 FVector ARSCharacter::GetSocketLocation(FName SocketName) const
 {
 	if (UMeshComponent* MeshComp = FindComponentByClass<UMeshComponent>())

@@ -27,8 +27,9 @@ public:
 	virtual bool IsImmune() const = 0;
 	virtual void ApplyHeal(float Damage, AActor* InCaster) = 0;
 	virtual void ApplyDamage(float Damage, AActor* InCaster) = 0;
-	virtual void Launch(const FVector& Velocity, AActor* Caster) = 0;
 	virtual void ApplyDie(AActor* InCaster) = 0;
+	
+	virtual void Launch(const FVector& Velocity, AActor* Caster) = 0;
 
 	virtual float GetStat(const FGameplayTag& Tag) const = 0;
 	virtual void SetStat(const FGameplayTag& Tag, float Value) const = 0;

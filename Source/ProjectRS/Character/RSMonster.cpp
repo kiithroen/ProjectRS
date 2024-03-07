@@ -72,10 +72,25 @@ void ARSMonster::ApplyDamage(float Damage, AActor* Caster)
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
 		MeshComp->SetScalarParameterValueOnMaterials(FRSName::MatParam_HitSplash, 1.f);
+		MeshComp->GlobalAnimRateScale = 0.1f;
 	}
-	CustomTimeDilation = 0.f;
+
+	StopMovementAll();
+	
+	if (Preset.IsValid())
+	{
+		if (UAnimMontage* Montage = Preset->HitMontage.LoadSynchronous())
+		{
+			EnableMovementInput(false);
+			PlayAnimMontageWithEnd(Montage, [this](UAnimMontage*,bool)
+			{
+				EnableMovementInput(true);
+			});
+		}
+	}
+	
 	ClearHitStopTimer();
-	GetWorldTimerManager().SetTimer(HitStopTimerHandle, this, &ARSMonster::OnHitStopTimeout, 5.f / 60.f);
+	GetWorldTimerManager().SetTimer(HitStopTimerHandle, this, &ARSMonster::OnHitStopTimeout, 10.f / 60.f);
 }
 
 void ARSMonster::ApplyDie(AActor* Caster)
@@ -104,8 +119,9 @@ void ARSMonster::OnHitStopTimeout()
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
 		MeshComp->SetScalarParameterValueOnMaterials(FRSName::MatParam_HitSplash, 0);
+		MeshComp->GlobalAnimRateScale = 1.f;
 	}
-	CustomTimeDilation = 1.f;
+	
 	ClearHitStopTimer();
 }
 

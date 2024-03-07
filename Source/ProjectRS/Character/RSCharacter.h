@@ -37,8 +37,9 @@ public:
 	virtual bool IsImmune() const override;
 	virtual void ApplyHeal(float Heal, AActor* Caster) override;
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
-	virtual void Launch(const FVector& Velocity, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;
+	
+	virtual void Launch(const FVector& Velocity, AActor* Caster) override;
 
 	virtual float GetStat(const FGameplayTag& Tag) const override;
 	virtual void SetStat(const FGameplayTag& Tag, float Value) const override;
@@ -58,6 +59,8 @@ public:
 	void EnableMovementInput(bool bEnable);
 
 	void EnableGhost(bool bEnable);
+
+	float PlayAnimMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	
 	FVector GetSocketLocation(FName SocketName) const;
 

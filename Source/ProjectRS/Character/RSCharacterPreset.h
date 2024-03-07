@@ -27,5 +27,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "RS", meta = (Categories = "Skill.Id"))
 	TArray<FGameplayTag> DefaultSkillItemIds;
 
+	UPROPERTY(EditDefaultsOnly, Category = "RS")
+	TSoftObjectPtr<UAnimMontage> HitMontage;
+	
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 };

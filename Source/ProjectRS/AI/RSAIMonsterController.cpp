@@ -25,14 +25,17 @@ void ARSAIMonsterController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APawn* OwnerPawn = GetPawn();
-	if (!IsValid(OwnerPawn))
+	ARSCharacter* OwnerCharacter = Cast<ARSCharacter>(GetPawn());
+	if (!IsValid(OwnerCharacter))
 		return;
 
+	if (OwnerCharacter->IsDead())
+		return;
+	
 	const AActor* Hero = GetTopAggro();
 	if (!IsValid(Hero))
 		return;
 
-	const FVector Direction = UKismetMathLibrary::GetDirectionUnitVector(OwnerPawn->GetActorLocation(), Hero->GetActorLocation());
-	OwnerPawn->AddMovementInput(Direction);
+	const FVector Direction = UKismetMathLibrary::GetDirectionUnitVector(OwnerCharacter->GetActorLocation(), Hero->GetActorLocation());
+	OwnerCharacter->AddMovementInput(Direction);
 }
