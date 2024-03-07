@@ -27,13 +27,17 @@ protected:
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;
 
-protected:
 	UFUNCTION()
 	void OnHitStopTimeout();
-
+	
 private:
+	void PlayHitStop();
 	void ClearHitStopTimer();
 
-private:
+	void StartBuryCoprse();
+	void UpdateBuryCoprse(float DeltaTime);
+	
 	FTimerHandle HitStopTimerHandle;
+	FVector DeathLocation;
+	bool bBuryCorpse = false;
 };

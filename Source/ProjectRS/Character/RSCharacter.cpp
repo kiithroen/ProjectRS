@@ -35,12 +35,12 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MovementComp->GravityScale = 3.f;
 	}
 
-	if (USkeletalMeshComponent* SpriteComp = GetMesh())
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
-		SpriteComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		SpriteComp->SetCollisionProfileName(TEXT("NoCollision"));
-		SpriteComp->SetGenerateOverlapEvents(false);
-		SpriteComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+		MeshComp->SetGenerateOverlapEvents(false);
+		MeshComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	}
 
 	HitBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
