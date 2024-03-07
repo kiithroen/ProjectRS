@@ -51,7 +51,7 @@ public:
 	bool HasFlagAny(const FGameplayTagContainer& Tags, bool bExact = true) const;
 	bool HasFlagAll(const FGameplayTagContainer& Tags, bool bExact = true) const;
 
-	URSSkillEffect* AddSkillEffect(const URSSkillEffect* SkillEffect, int32 Level, AActor* Caste, const FHitResult* HitResult = nullptr);
+	URSSkillEffect* AddSkillEffect(const URSSkillEffect* SkillEffect, int32 Level, AActor* Caster, AActor* Causer = nullptr, const FHitResult* HitResult = nullptr);
 	void RemoveSkillEffect(URSSkillEffect* SkillEffect);
 	void ClearSkillEffect(URSSkillEffect* SkillEffect);
 	URSSkillEffect* FindSkillEffectByStackGroupTag(const FGameplayTag& StackGroupTag) const;

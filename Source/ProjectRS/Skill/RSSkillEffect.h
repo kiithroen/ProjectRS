@@ -33,9 +33,12 @@ public:
 	void Init(URSSkillComponent* InComponent);
 	void Tick(float DeltaTime);
 
-	void SetCaster(AActor* Caster);
+	void AddCaster(AActor* Caster);
 	AActor* GetCaster() const;
 
+	void AddCauser(AActor* Causer);
+	AActor* GetCauser() const;
+	
 	void AddHitResult(const FHitResult& HitResult);
 	FHitResult* GetHitResult() const;
 
@@ -68,6 +71,7 @@ public:
 	void ResetRemainTime();
 	
 	bool IsExpired() const;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SkillEffect")
 	int32 RequiredLevel = 1;
@@ -99,11 +103,11 @@ protected:
 private:
 	TWeakObjectPtr<URSSkillComponent> OwnerComponent;
 	TWeakObjectPtr<AActor> Caster;
+	TWeakObjectPtr<AActor> Causer;
+	TSharedPtr<FHitResult>	HitResult;
 	
 	int32 Level = 0;
 	int32 RepeatCount = 0;
 	int32 StackCount = 0;
 	float RemainTime = 0.f;
-
-	TSharedPtr<FHitResult>	HitResult;
 };

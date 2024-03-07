@@ -112,7 +112,7 @@ void URSSkillEffect::Tick(float DeltaTime)
 	Do(DeltaTime);
 }
 
-void URSSkillEffect::SetCaster(AActor* InCaster)
+void URSSkillEffect::AddCaster(AActor* InCaster)
 {
 	Caster = InCaster;
 }
@@ -120,6 +120,16 @@ void URSSkillEffect::SetCaster(AActor* InCaster)
 AActor* URSSkillEffect::GetCaster() const
 {
 	return Caster.Get();
+}
+
+void URSSkillEffect::AddCauser(AActor* InCauser)
+{
+	Causer = InCauser;
+}
+
+AActor* URSSkillEffect::GetCauser() const
+{
+	return Causer.Get();
 }
 
 void URSSkillEffect::AddHitResult(const FHitResult& InHitResult)

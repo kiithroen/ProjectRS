@@ -174,13 +174,12 @@ void URSSkill_RangeAttack::OnProjectileHit(ARSProjectile* Projectile, const TArr
 
 		for (auto& SkillEffect : SkillEffectOnHit)
 		{
-			SkillComp->AddSkillEffect(SkillEffect, GetLevel(), GetOwnerActor(), &HitResult);
+			SkillComp->AddSkillEffect(SkillEffect, GetLevel(), GetOwnerActor(), Projectile, &HitResult);
 		}
 	}
 }
 
 void URSSkill_RangeAttack::OnProjectileExplosion(ARSProjectile* Projectile, int32 HitCount)
 {
-	// 폭발시 스플래시 처리
-	//UE_LOG(LogRS, Display, TEXT("Explosion"));
+	// TODO: 폭발시 스플래시 처리
 }

@@ -261,7 +261,7 @@ bool URSSkillComponent::HasFlagAll(const FGameplayTagContainer& Tags, bool bExac
 	return Flags.HasAll(Tags);
 }
 
-URSSkillEffect* URSSkillComponent::AddSkillEffect(const URSSkillEffect* SkillEffect, int32 Level, AActor* Caster, const FHitResult* HitResult)
+URSSkillEffect* URSSkillComponent::AddSkillEffect(const URSSkillEffect* SkillEffect, int32 Level, AActor* Caster, AActor* Causer, const FHitResult* HitResult)
 {
 	if (Level < SkillEffect->GetRequiredLevel())
 		return nullptr;
@@ -303,7 +303,8 @@ URSSkillEffect* URSSkillComponent::AddSkillEffect(const URSSkillEffect* SkillEff
 
 	NewSkillEffect->Init(this);
 	NewSkillEffect->SetLevel(Level);
-	NewSkillEffect->SetCaster(Caster);
+	NewSkillEffect->AddCaster(Caster);
+	NewSkillEffect->AddCauser(Causer);
 	if (HitResult)
 	{
 		NewSkillEffect->AddHitResult(*HitResult);
