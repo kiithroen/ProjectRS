@@ -22,12 +22,9 @@ void ARSAIController::Tick(float DeltaTime)
 void ARSAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	SetActorTickEnabled(true);
 }
 
 void ARSAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
-
-	SetActorTickEnabled(false);
 }

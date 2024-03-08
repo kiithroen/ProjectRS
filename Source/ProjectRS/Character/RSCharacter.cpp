@@ -33,8 +33,6 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MovementComp->bOrientRotationToMovement = true;
 		MovementComp->RotationRate = FRotator(0.f, 720.f, 0.f);
 		MovementComp->GravityScale = 3.f;
-		MovementComp->bAlwaysCheckFloor = false;
-		MovementComp->bEnablePhysicsInteraction = false;
 	}
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())

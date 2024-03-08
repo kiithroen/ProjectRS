@@ -26,7 +26,7 @@ public class ProjectRS : ModuleRules
 			"UMG",
 			"GameplayAbilities",
 			"DeveloperSettings",
-			"StructUtils"
+			"NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

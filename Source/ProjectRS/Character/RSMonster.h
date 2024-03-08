@@ -36,6 +36,8 @@ private:
 
 	void StartBuryCoprse();
 	void UpdateBuryCoprse(float DeltaTime);
+
+	void UpdateAI();
 	
 	FTimerHandle HitStopTimerHandle;
 	FVector DeathLocation;

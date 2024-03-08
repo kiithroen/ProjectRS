@@ -3,6 +3,7 @@
 
 #include "Character/RSMonster.h"
 
+#include "NavigationSystem.h"
 #include "RSCharacterPreset.h"
 #include "GameFramework/RSAssetManager.h"
 #include "Common/RsUtil.h"
@@ -10,7 +11,10 @@
 #include "AI/RSAIMonsterController.h"
 #include "Character/RSHero.h"
 #include "Data/RSGlobalData.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Navigation/PathFollowingComponent.h"
 
 ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
@@ -42,8 +46,23 @@ ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const F
 ARSMonster::ARSMonster(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.1f;
+	PrimaryActorTick.TickGroup = TG_DuringPhysics;
+	
 	AIControllerClass = ARSAIMonsterController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::Disabled;
+
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		MovementComp->bAlwaysCheckFloor = false;
+		MovementComp->bEnablePhysicsInteraction = false;
+		MovementComp->DefaultLandMovementMode = MOVE_NavWalking;
+		MovementComp->bSweepWhileNavWalking = false;
+		MovementComp->SetGroundMovementMode(MOVE_NavWalking);
+		MovementComp->bUseRVOAvoidance = true;
+		MovementComp->AvoidanceConsiderationRadius = 150.f;
+	}
 }
 
 void ARSMonster::BeginPlay()
@@ -63,6 +82,31 @@ void ARSMonster::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateBuryCoprse(DeltaTime);
+	
+	UpdateAI();
+}
+
+void ARSMonster::UpdateAI()
+{
+	if (IsDead())
+		return;
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (!IsValid(AIController))
+		return;
+	
+	ARSHero* Hero = Cast<ARSHero>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!IsValid(Hero))
+		return;
+
+	UPathFollowingComponent* PathFollowingComp = AIController->GetPathFollowingComponent();
+	if (!PathFollowingComp)
+		return;
+		
+	if (PathFollowingComp->GetStatus() == EPathFollowingStatus::Idle)
+	{
+		AIController->MoveToActor(Hero, 100.f);
+	}
 }
 
 void ARSMonster::ApplyDamage(float Damage, AActor* Caster)
