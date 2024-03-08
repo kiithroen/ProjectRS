@@ -43,30 +43,3 @@ UE_DEFINE_GAMEPLAY_TAG(RSGT_SkillEffect_StackGroup_Null, "SkillEffect.StackGroup
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Character_Id_Null, "Character.Id.Null");
 
 const FName FRSName::MatParam_HitSplash = FName(TEXT("HitSplash"));
-
-ETeamAttitude::Type RSTeamType::Resolve(const AActor* LeftActor, const AActor* RightActor)
-{
-	if (LeftActor == RightActor)
-		return ETeamAttitude::Friendly;
-
-	const ACharacter* LeftCharacter = Cast<const ACharacter>(LeftActor);
-	if (!LeftCharacter)
-		return ETeamAttitude::Neutral;
-
-	const ACharacter* RightCharacter = Cast<const ACharacter>(RightActor);
-	if (!RightCharacter)
-		return ETeamAttitude::Neutral;
-
-	const IGenericTeamAgentInterface* LeftTeam = Cast<const IGenericTeamAgentInterface>(LeftCharacter->GetController());
-	if (!LeftTeam)
-		return ETeamAttitude::Neutral;
-
-	const IGenericTeamAgentInterface* RightTeam = Cast<const IGenericTeamAgentInterface>(RightCharacter->GetController());
-	if (!RightTeam)
-		return ETeamAttitude::Neutral;
-
-	if (LeftTeam->GetGenericTeamId() == RightTeam->GetGenericTeamId())
-		return ETeamAttitude::Friendly;
-
-	return ETeamAttitude::Hostile;
-}

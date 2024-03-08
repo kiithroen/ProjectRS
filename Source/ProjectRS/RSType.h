@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameplayTagContainer.h"
-#include "GenericTeamAgentInterface.h"
 #include "NativeGameplayTags.h"
 #include "RSType.generated.h"
 
@@ -81,15 +80,6 @@ enum class ERSFieldItemType : uint8
 	HealthPotion,
 	Bomb,
 };
-
-namespace RSTeamType
-{
-	const static FGenericTeamId Neutral = FGenericTeamId(uint8(ERSTeamId::Neutral));
-	const static FGenericTeamId Monster = FGenericTeamId(uint8(ERSTeamId::Monster));
-	const static FGenericTeamId Player = FGenericTeamId(uint8(ERSTeamId::Player));
-
-	ETeamAttitude::Type Resolve(const AActor* LeftActor, const AActor* RightActor);
-}
 
 USTRUCT(BlueprintType)
 struct FRSParticleInfo

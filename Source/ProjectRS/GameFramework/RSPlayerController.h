@@ -27,10 +27,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	
-	virtual void SetGenericTeamId(const FGenericTeamId& Id) override { TeamId = Id; }
-	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override { return RSTeamType::Resolve(GetPawn(), &Other); }
-
 	void OnInputMove(const FInputActionValue& Value);
 	void OnInputButtonA(const FInputActionValue& Value);
 
@@ -47,8 +43,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> ButtonAAction;
-
-private:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FGenericTeamId TeamId;
 };

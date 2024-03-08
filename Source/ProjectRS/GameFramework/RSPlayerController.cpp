@@ -9,7 +9,6 @@
 
 ARSPlayerController::ARSPlayerController()
 {
-	TeamId = RSTeamType::Player;
 }
 
 void ARSPlayerController::BeginPlay()
