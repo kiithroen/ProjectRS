@@ -41,6 +41,10 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 		MeshComp->SetGenerateOverlapEvents(false);
 		MeshComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		MeshComp->bUseAttachParentBound = true;
+		MeshComp->bComponentUseFixedSkelBounds = true;
+		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+		MeshComp->bEnableUpdateRateOptimizations = true;
 	}
 
 	HitBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
@@ -51,6 +55,7 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		HitBoxComp->SetCollisionProfileName(TEXT("HitBox"));
 		HitBoxComp->SetGenerateOverlapEvents(false);
 		HitBoxComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		HitBoxComp->bUseAttachParentBound = true;
 	}
 
 	SkillComp = CreateDefaultSubobject<URSSkillComponent>(TEXT("Skill"));
