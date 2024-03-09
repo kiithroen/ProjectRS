@@ -2,6 +2,8 @@
 
 
 #include "RSFieldItem.h"
+
+#include "RSType.h"
 #include "Character/RSHero.h"
 #include "Skill/RSSkillComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,6 +30,8 @@ void ARSFieldItem::BeginPlay()
 
 void ARSFieldItem::Tick(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_FieldItemTick);
+	
 	Super::Tick(DeltaTime);
 
 	ARSHero* Hero = Cast<ARSHero>(UGameplayStatics::GetPlayerCharacter(this, 0));

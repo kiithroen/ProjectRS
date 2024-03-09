@@ -8,9 +8,9 @@
 #include "Interface/RSCombatInterface.h"
 #include "RSCharacter.generated.h"
 
+class URSHitBoxComponent;
 class URSStatComponent;
 class URSSkillComponent;
-class UBoxComponent;
 class URSCharacterPreset;
 class ARSCharacter;
 
@@ -64,7 +64,7 @@ public:
 	
 	FVector GetSocketLocation(FName SocketName) const;
 
-	FORCEINLINE UBoxComponent* GetHitBox() const { return HitBoxComp; }
+	FORCEINLINE URSHitBoxComponent* GetHitBox() const { return HitBoxComp; }
 	FORCEINLINE URSSkillComponent* GetSkill() const { return SkillComp; }
 	FORCEINLINE URSStatComponent* GetStat() const { return StatComp; }
 
@@ -80,7 +80,7 @@ public:
 	FRSOnDie OnDie;
 	
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UBoxComponent> HitBoxComp;
+	TObjectPtr<URSHitBoxComponent> HitBoxComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSSkillComponent> SkillComp;

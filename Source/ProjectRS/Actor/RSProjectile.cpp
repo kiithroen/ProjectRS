@@ -3,7 +3,9 @@
 
 #include "Actor/RSProjectile.h"
 
+#include "RSType.h"
 #include "Common/RSUtil.h"
+#include "Component/RSProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -34,7 +36,7 @@ ARSProjectile::ARSProjectile()
 		MeshComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	}
 
-	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ProjectileMovementComp = CreateDefaultSubobject<URSProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (ProjectileMovementComp)
 	{
 		ProjectileMovementComp->SetUpdatedComponent(SphereComp);
@@ -44,6 +46,7 @@ ARSProjectile::ARSProjectile()
 		ProjectileMovementComp->bShouldBounce = false;
 		ProjectileMovementComp->Bounciness = 0.0f;
 		ProjectileMovementComp->ProjectileGravityScale = 0.0f;
+		ProjectileMovementComp->bSweepCollision = false;
 	}
 }
 
@@ -56,6 +59,8 @@ void ARSProjectile::BeginPlay()
 
 void ARSProjectile::Tick(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_ProjectileTick);
+	
 	Super::Tick(DeltaTime);
 
 	if (!SphereComp)

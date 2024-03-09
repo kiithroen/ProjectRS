@@ -5,6 +5,7 @@
 #include "Skill/RSSkill.h"
 #include "Skill/RSSkillEffect.h"
 #include "Common/RSUtil.h"
+#include "System/RSAggregatingTickSubsystem.h"
 
 URSSkillComponent::URSSkillComponent()
 {
@@ -14,10 +15,30 @@ URSSkillComponent::URSSkillComponent()
 void URSSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		PrimaryComponentTick.UnRegisterTickFunction();
+		AggregatingTickSubsystem->RegisterComponent(this, TG_DuringPhysics);
+	}
+	
 }
 
 void URSSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		AggregatingTickSubsystem->UnRegisterComponent(this);
+	}
+	
 	Super::EndPlay(EndPlayReason);
 
 	OnFlagAdded.Clear();
@@ -26,6 +47,8 @@ void URSSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void URSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SCOPE_CYCLE_COUNTER(STAT_SkillTick);
+	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UpdateSkills(DeltaTime);

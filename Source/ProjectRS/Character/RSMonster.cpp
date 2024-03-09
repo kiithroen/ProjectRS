@@ -79,6 +79,8 @@ void ARSMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void ARSMonster::Tick(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_MonsterTick);
+	
 	Super::Tick(DeltaTime);
 
 	UpdateBuryCoprse(DeltaTime);

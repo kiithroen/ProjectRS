@@ -24,6 +24,8 @@ void URSSkill_RangeAttack::OnBegin()
 
 void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_SkillRangeAttackTick);
+	
 	Super::OnUpdate(DeltaTime);
 
 	RemainShotTime = FMath::Max(RemainShotTime - DeltaTime, 0.f);
@@ -109,6 +111,8 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 	const int32 ProjectileSpawnCount = ProjectileCount.AsInteger(GetLevel());
 	for (int32 Index = 0; Index < ProjectileSpawnCount; ++Index)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_ProjectileSpawn);
+		
 		ARSProjectile* Projectile = URSUtil::SpawnActor<ARSProjectile>(World, ProjectileClass, SpawnLocation, SpawnRotation);
 		if (!IsValid(Projectile))
 			continue;

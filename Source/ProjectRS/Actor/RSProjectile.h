@@ -6,9 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "RSProjectile.generated.h"
 
+class URSProjectileMovementComponent;
 class USphereComponent;
 class UPaperFlipbookComponent;
-class UProjectileMovementComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileHit, ARSProjectile*, const TArray<FHitResult>&);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileExplosion, ARSProjectile*, int32);
@@ -47,7 +47,7 @@ private:
 	TObjectPtr<UStaticMeshComponent> MeshComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
+	TObjectPtr<URSProjectileMovementComponent> ProjectileMovementComp;
 
 public:
 	FRSOnProjectileHit OnProjectileHit;

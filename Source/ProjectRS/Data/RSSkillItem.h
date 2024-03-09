@@ -20,7 +20,7 @@ public:
 		Type = ERSItemType::Skill;
 	}
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Skill", meta = (Categories = "Skill.Id"))
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
 	int32 InitialLevel = 1;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Skill")

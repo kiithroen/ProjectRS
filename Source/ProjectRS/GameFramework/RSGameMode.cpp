@@ -103,8 +103,6 @@ void ARSGameMode::OnSpawnTimer()
 		return;
 
 	SpawnMonster();
-
-	UE_LOG(LogRS, Display, TEXT("Monster Num : %d"), SpawnedMonster.Num());
 }
 
 void ARSGameMode::UpdateMonster()

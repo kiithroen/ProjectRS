@@ -11,11 +11,13 @@
 #include "RSType.h"
 #include "Skill/RSSkill.h"
 #include "Character/RSCharacterPreset.h"
+#include "Component/RSCharacterMovementComponent.h"
+#include "Component/RSHitBoxComponent.h"
 #include "Data/RSSkillItem.h"
 #include "GameFramework/RSAssetManager.h"
 
 ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<URSCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -47,7 +49,7 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MeshComp->bEnableUpdateRateOptimizations = true;
 	}
 
-	HitBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
+	HitBoxComp = CreateDefaultSubobject<URSHitBoxComponent>(TEXT("HitBox"));
 	if (HitBoxComp)
 	{
 		HitBoxComp->SetupAttachment(GetCapsuleComponent());
@@ -103,6 +105,8 @@ void ARSCharacter::Init(URSCharacterPreset* InPreset)
 
 void ARSCharacter::Tick(float DeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_CharacterTick);
+	
 	Super::Tick(DeltaTime);
 	
 	LastMovementDirection = GetActorForwardVector();
