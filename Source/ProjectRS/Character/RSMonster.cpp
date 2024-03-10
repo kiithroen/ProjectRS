@@ -12,6 +12,7 @@
 #include "Component/RSMonsterMovementComponent.h"
 #include "Data/RSGlobalData.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
@@ -30,6 +31,7 @@ ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const F
 		ensure(false);
 		return nullptr;
 	}
+	
 	ARSMonster* Monster = URSUtil::SpawnActor<ARSMonster>(World, CharacterClass, SpawnLocation, SpawnRotation);
 	if (!IsValid(Monster))
 		return nullptr;
@@ -48,6 +50,11 @@ ARSMonster::ARSMonster(const FObjectInitializer& ObjectInitializer)
 	AIControllerClass = ARSAIMonsterController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
+	if (UCapsuleComponent* CapsuleComp = GetCapsuleComponent())
+	{
+		CapsuleComp->SetGenerateOverlapEvents(false);
+	}
+	
 	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
 	{
 		MovementComp->bAlwaysCheckFloor = false;

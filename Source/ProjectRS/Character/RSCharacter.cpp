@@ -48,6 +48,7 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 		MeshComp->bEnableUpdateRateOptimizations = true;
 		MeshComp->KinematicBonesUpdateType = EKinematicBonesUpdateToPhysics::SkipAllBones;
+		MeshComp->bConsiderAllBodiesForBounds = false;
 	}
 
 	HitBoxComp = CreateDefaultSubobject<URSHitBoxComponent>(TEXT("HitBox"));
