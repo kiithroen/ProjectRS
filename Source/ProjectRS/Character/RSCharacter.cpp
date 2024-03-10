@@ -11,13 +11,13 @@
 #include "RSType.h"
 #include "Skill/RSSkill.h"
 #include "Character/RSCharacterPreset.h"
-#include "Component/RSCharacterMovementComponent.h"
+#include "Component/RSMonsterMovementComponent.h"
 #include "Component/RSHitBoxComponent.h"
 #include "Data/RSSkillItem.h"
 #include "GameFramework/RSAssetManager.h"
 
 ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer.SetDefaultSubobjectClass<URSCharacterMovementComponent>(CharacterMovementComponentName))
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -47,6 +47,7 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MeshComp->bComponentUseFixedSkelBounds = true;
 		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 		MeshComp->bEnableUpdateRateOptimizations = true;
+		MeshComp->KinematicBonesUpdateType = EKinematicBonesUpdateToPhysics::SkipAllBones;
 	}
 
 	HitBoxComp = CreateDefaultSubobject<URSHitBoxComponent>(TEXT("HitBox"));

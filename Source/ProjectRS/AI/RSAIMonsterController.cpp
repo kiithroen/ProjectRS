@@ -3,6 +3,12 @@
 
 #include "AI/RSAIMonsterController.h"
 
+#include "Character/RSHero.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Navigation/PathFollowingComponent.h"
+
 ARSAIMonsterController::ARSAIMonsterController()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -11,14 +17,51 @@ ARSAIMonsterController::ARSAIMonsterController()
 void ARSAIMonsterController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	GetWorldTimerManager().SetTimer(AITimerHandle, this, &ARSAIMonsterController::OnUpdateAI, 10.f / 60.f, true);
 }
 
 void ARSAIMonsterController::OnUnPossess()
 {
 	Super::OnUnPossess();
+	
+	ClearAITimer();
 }
 
 void ARSAIMonsterController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ARSAIMonsterController::OnUpdateAI()
+{
+	IRSCombatInterface* OwnerCombat = Cast<IRSCombatInterface>(GetCharacter());
+	if (!OwnerCombat)
+		return;
+	
+	if (OwnerCombat->IsDead())
+		return;
+	
+	ARSHero* Hero = Cast<ARSHero>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!IsValid(Hero))
+		return;
+
+	UPathFollowingComponent* PathFollowingComp = GetPathFollowingComponent();
+	if (!PathFollowingComp)
+		return;
+		
+	if (PathFollowingComp->GetStatus() == EPathFollowingStatus::Idle)
+	{
+		MoveToActor(Hero, 100.f);
+	}
+}
+
+
+void ARSAIMonsterController::ClearAITimer()
+{
+	if (AITimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(AITimerHandle);
+		AITimerHandle.Invalidate();
+	}
 }

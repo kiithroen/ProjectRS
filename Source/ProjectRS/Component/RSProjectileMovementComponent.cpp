@@ -3,6 +3,7 @@
 
 #include "RSProjectileMovementComponent.h"
 
+#include "RSType.h"
 #include "System/RSAggregatingTickSubsystem.h"
 
 
@@ -37,4 +38,11 @@ void URSProjectileMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayR
 	}
 	
 	Super::EndPlay(EndPlayReason);
+}
+
+void URSProjectileMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	SCOPE_CYCLE_COUNTER(STAT_ProjectileMovementTick);
+	
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }

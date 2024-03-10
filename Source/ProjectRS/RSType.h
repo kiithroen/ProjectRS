@@ -18,6 +18,8 @@ DECLARE_CYCLE_STAT(TEXT("Skill [Tick]"), STAT_SkillTick, STATGROUP_RS);
 DECLARE_CYCLE_STAT(TEXT("Projectile [Tick]"), STAT_ProjectileTick, STATGROUP_RS);
 DECLARE_CYCLE_STAT(TEXT("Projectile [Spawn]"), STAT_ProjectileSpawn, STATGROUP_RS);
 DECLARE_CYCLE_STAT(TEXT("FieldItem [Tick]"), STAT_FieldItemTick, STATGROUP_RS);
+DECLARE_CYCLE_STAT(TEXT("MonsterMovement"), STAT_MonsterMovement, STATGROUP_RS);
+DECLARE_CYCLE_STAT(TEXT("ProjectileMovement [Tick]"), STAT_ProjectileMovementTick, STATGROUP_RS);
 
 DECLARE_CYCLE_STAT(TEXT("RangeAttack[Update]"), STAT_SkillRangeAttackTick, STATGROUP_RSSKILL);
 

@@ -26,7 +26,7 @@ protected:
 
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;
-
+	
 	UFUNCTION()
 	void OnHitStopTimeout();
 	
@@ -36,8 +36,6 @@ private:
 
 	void StartBuryCoprse();
 	void UpdateBuryCoprse(float DeltaTime);
-
-	void UpdateAI();
 	
 	FTimerHandle HitStopTimerHandle;
 	FVector DeathLocation;

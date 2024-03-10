@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "RSProjectileMovementComponent.generated.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "RSMonsterMovementComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PROJECTRS_API URSProjectileMovementComponent : public UProjectileMovementComponent
+class PROJECTRS_API URSMonsterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 
 public:
-	URSProjectileMovementComponent();
+	URSMonsterMovementComponent();
 
 protected:
 	virtual void BeginPlay() override;
@@ -21,4 +21,8 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+protected:
+	virtual void PerformMovement(float DeltaTime) override;
+	virtual void PhysNavWalking(float DeltaTime, int32 Iterations) override;
 };
