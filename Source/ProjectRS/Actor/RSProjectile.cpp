@@ -72,7 +72,7 @@ void ARSProjectile::Tick(float DeltaTime)
 	
 	TArray<FHitResult> OutHitResults;
 	FRSTargetInfo_SphereArea TargetInfo;
-	TargetInfo.StartLocation = GetActorLocation();
+	TargetInfo.StartLocation = PrevLocation;
 	TargetInfo.EndLocation = GetActorLocation();
 	TargetInfo.Radius = SphereComponent->GetScaledSphereRadius();
 	TargetInfo.TraceChannel = TraceChannel;
