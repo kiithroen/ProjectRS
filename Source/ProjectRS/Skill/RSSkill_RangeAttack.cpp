@@ -8,6 +8,7 @@
 #include "Common/RSUtil.h"
 #include "Character/RSMonster.h"
 #include "Algo/RandomShuffle.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 URSSkill_RangeAttack::URSSkill_RangeAttack()
@@ -64,16 +65,18 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 	{
 		AimDirection = OwnerActor->GetActorForwardVector();
 	}
+	TArray<FHitResult> OutHitResults;
+	FRSTargetInfo_SphereArea TargetInfo;
+	TargetInfo.StartLocation = OwnerLocation;
+	TargetInfo.EndLocation = OwnerLocation;
+	TargetInfo.Radius = AttackRange;
+	TargetInfo.TraceChannel = TraceChannel;
 	
-	const ECollisionChannel CollisionChannel = UEngineTypes::ConvertToCollisionChannel(TraceChannel);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(OwnerActor);
-
-	TArray<FOverlapResult> OutOverlapResults;
-	World->OverlapMultiByChannel(OutOverlapResults, OwnerLocation, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(AttackRange), Params);
+	TArray<AActor*> ActorsToIgnore;
 	
-	OutOverlapResults.RemoveAllSwap([&OwnerLocation, &AimDirection, this](const FOverlapResult& A) {
+	URSUtil::CollectTargets_SphereArea(OwnerActor, TargetInfo, ActorsToIgnore, OutHitResults);
+	
+	OutHitResults.RemoveAllSwap([&OwnerLocation, &AimDirection, this](const FHitResult& A) {
 			AActor* Actor = A.GetActor();
 			if (!IsValid(Actor))
 				return true;
@@ -85,10 +88,10 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 			return false;
 		});
 
-	if (OutOverlapResults.Num() == 0)
+	if (OutHitResults.Num() == 0)
 		return;
 	
-	OutOverlapResults.Sort([&OwnerLocation](const FOverlapResult& A, const FOverlapResult& B) {
+	OutHitResults.Sort([&OwnerLocation](const FHitResult& A, const FHitResult& B) {
 		const AActor* ActorA = A.GetActor();
 		const AActor* ActorB = B.GetActor();
 
@@ -122,9 +125,9 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 		Projectile->SetTraceChannel(TraceChannel);
 		Projectile->SetSpeed(ProjectileSpeed, ProjectileSpeed);
 
-		if (bAutoAiming && Index < OutOverlapResults.Num())
+		if (bAutoAiming && Index < OutHitResults.Num())
 		{
-			const AActor* TargetActor = OutOverlapResults[Index].GetActor();
+			const AActor* TargetActor = OutHitResults[Index].GetActor();
 			ensure(IsValid(TargetActor));
 			Projectile->SetHoming(TargetActor, 1.f);
 		}

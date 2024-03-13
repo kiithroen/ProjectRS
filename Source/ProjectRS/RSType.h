@@ -66,7 +66,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Item_Id_Null);
 
 constexpr float MaxDamage = 99999999;	// 현재는 1억 이하의 데미지만 고려
 
-struct FRSName
+struct PROJECTRS_API FRSName
 {
 	static const FName MatParam_HitSplash;
 };
@@ -97,7 +97,7 @@ enum class ERSFieldItemType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FRSParticleInfo
+struct PROJECTRS_API FRSParticleInfo
 {
 	GENERATED_BODY()
 
@@ -122,3 +122,117 @@ struct FRSParticleInfo
 	UPROPERTY(EditDefaultsOnly, Category = "RS")
 	int32 TranslucencySortPriority = 0;
 };
+
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_SocketTrace
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FName SocketStart;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FName SocketEnd;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float Radius = 30.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_BoxTrace
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FVector StartOffset = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FVector Direction = FVector::ForwardVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float Distance = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FVector HalfSize = FVector(100.f, 100.f, 100.f);;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_BoxArea
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector StartLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector EndLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	FVector HalfSize = FVector(100.f, 100.f, 100.f);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_SphereArea
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector StartLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector EndLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float Radius = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_CylinderArea
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector StartLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector EndLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float Radius = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+
+USTRUCT(BlueprintType)
+struct PROJECTRS_API FRSTargetInfo_CapsuleArea
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector StartLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite, Category = Combat)
+	FVector EndLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	float Radius = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+};
+

@@ -68,6 +68,6 @@ void URSSkillEffect_Damage::Do(float DeltaTime)
 
 	if (const FHitResult* Hit = GetHitResult())
 	{
-		OwnerCombat->Launch(-Hit->Normal * LaunchSpeed, GetCaster());
+		OwnerCombat->Launch(-Hit->Normal.GetSafeNormal2D() * LaunchSpeed, GetCaster());
 	}
 }

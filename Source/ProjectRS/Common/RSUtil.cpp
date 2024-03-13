@@ -5,6 +5,24 @@
 #include "HAL/FileManagerGeneric.h"
 #include <random>
 
+#include "RSType.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+static TAutoConsoleVariable<int32> CVarShowTargetTrace(
+	TEXT("rs.ShowTargetTrace"),
+	0,
+	TEXT("0: Disable, 1: Enable"),
+	ECVF_Default
+);
+
+static TAutoConsoleVariable<int32> CVarShowTargetTraceSeconds(
+	TEXT("rs.ShowTargetTraceSeconds"),
+	1 / 30,
+	TEXT(""),
+	ECVF_Default
+);
+
 static std::mt19937 mt_rand;
 
 void URSUtil::MTInit()
@@ -83,45 +101,74 @@ FName URSUtil::RandomWeightedName(const TMap<FName, int32>& Table)
 	return NAME_None;
 }
 
-void URSUtil::SphereTraceMulti(const UObject* WorldContextObject, const FVector& Start, const FVector& End, float Radius, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
+void URSUtil::CollectTargets_SocketTrace(const AActor* Actor, const FRSTargetInfo_SocketTrace& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
 {
-	static const FName SphereTraceMultiName(TEXT("SphereTraceMulti"));
-	FCollisionQueryParams Params(SphereTraceMultiName, bTraceComplex, IgnoreActor);
-	Params.AddIgnoredActors(ActorsToIgnore);
+	const UMeshComponent* MeshComp = Actor->FindComponentByClass<UMeshComponent>();
+	
+	const FVector SocketStartLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.SocketStart) : Actor->GetActorLocation();
+	const FVector SocketEndLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.SocketEnd) : Actor->GetActorLocation();
+	const FVector WorldDirection = UKismetMathLibrary::GetDirectionUnitVector(SocketStartLocation, SocketEndLocation);
+	const FVector StartLocation = SocketStartLocation + WorldDirection * TargetInfo.Radius;
+	const FVector EndLocation = SocketEndLocation - WorldDirection * TargetInfo.Radius;
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	World ? World->SweepMultiByChannel(OutHitResults, Start, End, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius), Params) : false;
+	const EDrawDebugTrace::Type DrawDebugTraceType = CVarShowTargetTrace.GetValueOnGameThread() == 1 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+
+	UKismetSystemLibrary::SphereTraceMulti(Actor, StartLocation, EndLocation, TargetInfo.Radius, TargetInfo.TraceChannel, false, ActorsToIgnore, DrawDebugTraceType, OutHitResults, true, FLinearColor::Red, FLinearColor::Green, CVarShowTargetTraceSeconds.GetValueOnGameThread());
 }
 
-
-void URSUtil::BoxTraceMulti(const UObject* WorldContextObject, const FVector& Start, const FVector& End, const FVector& HalfSize, const FRotator& Orientation, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
+void URSUtil::CollectTargets_BoxArea(const AActor* Actor, const FRSTargetInfo_BoxArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
 {
-	static const FName BoxTraceMultiName(TEXT("BoxTraceMulti"));
-	FCollisionQueryParams Params(BoxTraceMultiName, bTraceComplex, IgnoreActor);
-	Params.AddIgnoredActors(ActorsToIgnore);
+	const FVector WorldDirection = UKismetMathLibrary::GetDirectionUnitVector(TargetInfo.StartLocation, TargetInfo.EndLocation);
+	const FVector StartLocation = TargetInfo.StartLocation + WorldDirection * TargetInfo.HalfSize.X;
+	const FVector EndLocation = TargetInfo.EndLocation - WorldDirection * TargetInfo.HalfSize.X;
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	World ? World->SweepMultiByChannel(OutHitResults, Start, End, Orientation.Quaternion(), CollisionChannel, FCollisionShape::MakeBox(HalfSize), Params) : false;
+	const EDrawDebugTrace::Type DrawDebugTraceType = CVarShowTargetTrace.GetValueOnGameThread() == 1 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+
+	UKismetSystemLibrary::BoxTraceMulti(Actor, StartLocation, EndLocation, TargetInfo.HalfSize, WorldDirection.Rotation(), TargetInfo.TraceChannel, false, ActorsToIgnore, DrawDebugTraceType, OutHitResults, true, FLinearColor::Red, FLinearColor::Green, CVarShowTargetTraceSeconds.GetValueOnGameThread());
 }
 
-void URSUtil::SphereOverlapMulti(const UObject* WorldContextObject, const FVector& Origin, float Radius, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FOverlapResult>& OutOverlapResults)
+void URSUtil::CollectTargets_SphereArea(const AActor* Actor, const FRSTargetInfo_SphereArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
 {
-	static const FName SphereOverlapMultiName(TEXT("SphereOverlapMulti"));
-	FCollisionQueryParams Params(SphereOverlapMultiName, bTraceComplex, IgnoreActor);
-	Params.AddIgnoredActors(ActorsToIgnore);
+	const FVector WorldDirection = UKismetMathLibrary::GetDirectionUnitVector(TargetInfo.StartLocation, TargetInfo.EndLocation);
+	const FVector StartLocation = TargetInfo.StartLocation + WorldDirection * TargetInfo.Radius;
+	const FVector EndLocation = TargetInfo.EndLocation - WorldDirection * TargetInfo.Radius;
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	World ? World->OverlapMultiByChannel(OutOverlapResults, Origin, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius), Params) : false;
+	const EDrawDebugTrace::Type DrawDebugTraceType = CVarShowTargetTrace.GetValueOnGameThread() == 1 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+
+	UKismetSystemLibrary::SphereTraceMulti(Actor, StartLocation, EndLocation, TargetInfo.Radius, TargetInfo.TraceChannel, false, ActorsToIgnore, DrawDebugTraceType, OutHitResults, true, FLinearColor::Red, FLinearColor::Green, CVarShowTargetTraceSeconds.GetValueOnGameThread());
 }
 
-void URSUtil::BoxOverlapMulti(const UObject* WorldContextObject, const FVector& Origin, const FVector& HalfSize, const FRotator& Orientation, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FOverlapResult>& OutOverlapResults)
+void URSUtil::CollectTargets_CylinderArea(const AActor* Actor, const FRSTargetInfo_CylinderArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults)
 {
-	static const FName BoxOverlapMultiName(TEXT("BoxOverlapMulti"));
-	FCollisionQueryParams Params(BoxOverlapMultiName, bTraceComplex, IgnoreActor);
-	Params.AddIgnoredActors(ActorsToIgnore);
+	const float Height = FVector::Distance(TargetInfo.StartLocation, TargetInfo.EndLocation);
+	const FVector HalfSize = FVector(Height * 0.5f, TargetInfo.Radius, TargetInfo.Radius);
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
-	World ? World->OverlapMultiByChannel(OutOverlapResults, Origin, Orientation.Quaternion(), CollisionChannel, FCollisionShape::MakeBox(HalfSize), Params) : false;
+	const FVector WorldDirection = UKismetMathLibrary::GetDirectionUnitVector(TargetInfo.StartLocation, TargetInfo.EndLocation);
+	const FVector StartLocation = TargetInfo.StartLocation + WorldDirection * HalfSize.X;
+	const FVector EndLocation = TargetInfo.EndLocation - WorldDirection * HalfSize.X;
+
+	const EDrawDebugTrace::Type DrawDebugTraceType = CVarShowTargetTrace.GetValueOnGameThread() == 1 ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+
+	TArray<FHitResult> HitResults;
+	UKismetSystemLibrary::BoxTraceMulti(Actor, StartLocation, EndLocation, HalfSize, WorldDirection.Rotation(), TargetInfo.TraceChannel, false, ActorsToIgnore, DrawDebugTraceType, HitResults, true, FLinearColor::Red, FLinearColor::Green, CVarShowTargetTraceSeconds.GetValueOnGameThread());
+
+	const float RadiusSquared = FMath::Square(TargetInfo.Radius);
+
+	OutHitResults = HitResults.FilterByPredicate([=](const FHitResult& HitResult) {
+		AActor* TargetActor = HitResult.GetActor();
+		if (!IsValid(TargetActor))
+			return false;
+
+		if (FVector::DistSquared2D(StartLocation, TargetActor->GetActorLocation()) > RadiusSquared)
+			return false;
+
+		return true;
+		});
+	
+	if (CVarShowTargetTrace.GetValueOnGameThread() == 1)
+	{
+		UKismetSystemLibrary::DrawDebugCylinder(Actor, TargetInfo.StartLocation, TargetInfo.EndLocation, TargetInfo.Radius, 36, FLinearColor::White, 0.1f, 1.f);
+	}
 }
 
 float URSUtil::FindAngle2D(const FVector& StartDir, const FVector& TargetDir)

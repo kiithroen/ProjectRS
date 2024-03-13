@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EngineUtils.h"
+#include "RSType.h"
 #include "RSUtil.generated.h"
 
 /**
@@ -20,11 +21,12 @@ public:
 	static float MTFRandRange(float Min, float Max);
 	static int32 RandomWeightedIndex(const TArray<int32>& Table);
 	static FName RandomWeightedName(const TMap<FName, int32>& Table);
+
+	static void CollectTargets_SocketTrace(const AActor* Actor, const FRSTargetInfo_SocketTrace& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
+	static void CollectTargets_SphereArea(const AActor* Actor, const FRSTargetInfo_SphereArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
+	static void CollectTargets_BoxArea(const AActor* Actor, const FRSTargetInfo_BoxArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
+	static void CollectTargets_CylinderArea(const AActor* Actor, const FRSTargetInfo_CylinderArea& TargetInfo, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
 	
-	static void SphereTraceMulti(const UObject* WorldContextObject, const FVector& Start, const FVector& End, float Radius, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
-	static void BoxTraceMulti(const UObject* WorldContextObject, const FVector& Start, const FVector& End, const FVector& HalfSize, const FRotator& Orientation, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHitResults);
-	static void SphereOverlapMulti(const UObject* WorldContextObject, const FVector& Origin, float Radius, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FOverlapResult>& OutOverlapResults);
-	static void BoxOverlapMulti(const UObject* WorldContextObject, const FVector& Origin, const FVector& HalfSize, const FRotator& Orientation, ECollisionChannel CollisionChannel, bool bTraceComplex, const AActor* IgnoreActor, const TArray<AActor*>& ActorsToIgnore, TArray<FOverlapResult>& OutOverlapResults);
 	static float FindAngle2D(const FVector& StartDir, const FVector& TargetDir);
 
 	template <typename T>

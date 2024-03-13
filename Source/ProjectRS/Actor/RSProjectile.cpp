@@ -70,18 +70,13 @@ void ARSProjectile::Tick(float DeltaTime)
 	if (!World)
 		return;
 	
-	const float Radius = SphereComp->GetScaledSphereRadius();
-	const FVector StartLocation = PrevLocation;
-	const FVector EndLocation = GetActorLocation();
-
-	const ECollisionChannel CollisionChannel = UEngineTypes::ConvertToCollisionChannel(TraceChannel);
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActors(ActorsToIgnore);
-
 	TArray<FHitResult> OutHitResults;
-	World->SweepMultiByChannel(OutHitResults, StartLocation, EndLocation, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius), Params);
+	FRSTargetInfo_SphereArea TargetInfo;
+	TargetInfo.StartLocation = GetActorLocation();
+	TargetInfo.EndLocation = GetActorLocation();
+	TargetInfo.Radius = SphereComp->GetScaledSphereRadius();
+	TargetInfo.TraceChannel = TraceChannel;
+	URSUtil::CollectTargets_SphereArea(this, TargetInfo, ActorsToIgnore, OutHitResults);
 	
 	if (OutHitResults.Num() > 0)
 	{
