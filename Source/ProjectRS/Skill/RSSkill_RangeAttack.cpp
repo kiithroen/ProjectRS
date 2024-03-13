@@ -38,7 +38,7 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 		return;
 
 	AActor* OwnerActor = GetOwnerActor();
-	if (!OwnerActor)
+	if (!IsValid(OwnerActor))
 		return;
 
 	const URSSkillComponent* OwnerSkillComp = OwnerActor->FindComponentByClass<URSSkillComponent>();
@@ -163,7 +163,7 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 void URSSkill_RangeAttack::OnProjectileHit(ARSProjectile* Projectile, const TArray<FHitResult>& HitResults)
 {
 	const AActor* OwnerActor = GetOwnerActor();
-	if (!OwnerActor)
+	if (!IsValid(OwnerActor))
 		return;
 
 	for (auto& HitResult : HitResults)

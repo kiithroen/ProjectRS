@@ -16,7 +16,7 @@ void URSSkillEffect_Damage::Do(float DeltaTime)
 	if (!IsValid(OwnerActor))
 		return;
 	
-	IRSCombatInterface* OwnerCombat = Cast<ARSCharacter>(OwnerActor);
+	IRSCombatInterface* OwnerCombat = Cast<IRSCombatInterface>(OwnerActor);
 	if (!OwnerCombat)
 		return;
 
@@ -28,7 +28,7 @@ void URSSkillEffect_Damage::Do(float DeltaTime)
 	
 	float FinalDamage;
 	
-	if (IRSCombatInterface* CasterCombat = Cast<ARSCharacter>(GetCaster()))
+	if (IRSCombatInterface* CasterCombat = Cast<IRSCombatInterface>(GetCaster()))
 	{
 		const float AttackDamage = FMath::Max(1, CasterCombat->GetStat(RSGT_Stat_AttackDamage));
 		const float CalcDamage = (BaseDamage.GetValueAtLevel(GetLevel()) + AttackDamage * AttackDamageMultiplier.GetValueAtLevel(GetLevel())) * DamageReduction;

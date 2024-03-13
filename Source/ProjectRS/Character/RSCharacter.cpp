@@ -51,19 +51,19 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 		MeshComp->bConsiderAllBodiesForBounds = false;
 	}
 
-	HitBoxComp = CreateDefaultSubobject<URSHitBoxComponent>(TEXT("HitBox"));
-	if (HitBoxComp)
+	HitBoxComponent = CreateDefaultSubobject<URSHitBoxComponent>(TEXT("HitBox"));
+	if (HitBoxComponent)
 	{
-		HitBoxComp->SetupAttachment(GetCapsuleComponent());
-		HitBoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		HitBoxComp->SetCollisionProfileName(TEXT("HitBox"));
-		HitBoxComp->SetGenerateOverlapEvents(false);
-		HitBoxComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-		HitBoxComp->bUseAttachParentBound = true;
+		HitBoxComponent->SetupAttachment(GetCapsuleComponent());
+		HitBoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HitBoxComponent->SetCollisionProfileName(TEXT("HitBox"));
+		HitBoxComponent->SetGenerateOverlapEvents(false);
+		HitBoxComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		HitBoxComponent->bUseAttachParentBound = true;
 	}
 
-	SkillComp = CreateDefaultSubobject<URSSkillComponent>(TEXT("Skill"));
-	StatComp = CreateDefaultSubobject<URSStatComponent>(TEXT("Stat"));
+	SkillComponent = CreateDefaultSubobject<URSSkillComponent>(TEXT("Skill"));
+	StatComponent = CreateDefaultSubobject<URSStatComponent>(TEXT("Stat"));
 }
 
 void ARSCharacter::Init(URSCharacterPreset* InPreset)
@@ -76,14 +76,14 @@ void ARSCharacter::Init(URSCharacterPreset* InPreset)
 
 	Preset = InPreset;
 	
-	if (StatComp)
+	if (StatComponent)
 	{
-		StatComp->Init(Preset->DefaultStatValues);
+		StatComponent->Init(Preset->DefaultStatValues);
 	}
 	
-	if (SkillComp)
+	if (SkillComponent)
 	{
-		SkillComp->Init();
+		SkillComponent->Init();
 
 		for (auto& SkillItemId : Preset->DefaultSkillItemIds)
 		{
@@ -100,7 +100,7 @@ void ARSCharacter::Init(URSCharacterPreset* InPreset)
 			
 			Skill->SetLevel(SkillItem->InitialLevel);
 			
-			SkillComp->EquipSkill(Skill);
+			SkillComponent->EquipSkill(Skill);
 		}
 	}
 }
@@ -122,14 +122,14 @@ void ARSCharacter::BeginPlay()
 	
 	LastMovementDirection = GetActorForwardVector();
 
-	StatComp->OnStatValueChanged.AddUObject(this, &ARSCharacter::OnStatValueChanged);
+	StatComponent->OnStatValueChanged.AddUObject(this, &ARSCharacter::OnStatValueChanged);
 }
 
 void ARSCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	StatComp->OnStatValueChanged.RemoveAll(this);
+	StatComponent->OnStatValueChanged.RemoveAll(this);
 
 	OnHeal.Clear();
 	OnDamaged.Clear();
@@ -138,86 +138,72 @@ void ARSCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 bool ARSCharacter::IsDead() const
 {
-	if (!SkillComp)
+	if (!SkillComponent)
 		return false;
 	
-	return SkillComp->HasFlag(RSGT_Flag_Dead);
+	return SkillComponent->HasFlag(RSGT_Flag_Dead);
 }
 
 bool ARSCharacter::IsImmune() const
 {
-	if (!SkillComp)
+	if (!SkillComponent)
 		return false;
 	
-	return SkillComp->HasFlag(RSGT_Flag_Immune);
+	return SkillComponent->HasFlag(RSGT_Flag_Immune);
 }
 
 void ARSCharacter::ApplyHeal(float Heal, AActor* InCaster)
 {
-	if (!SkillComp)
+	if (!SkillComponent)
 		return;
 
-	if (!StatComp)
+	if (!StatComponent)
 		return;
 
-	if (SkillComp->HasFlag(RSGT_Flag_Dead))
+	if (SkillComponent->HasFlag(RSGT_Flag_Dead))
 		return;
 
-	StatComp->AddValue(RSGT_Stat_CurrentHP, Heal);
+	StatComponent->AddValue(RSGT_Stat_CurrentHP, Heal);
 
 	OnHeal.Broadcast(this, Heal, InCaster);
 }
 
 void ARSCharacter::ApplyDamage(float Damage, AActor* InCaster)
 {
-	if (!SkillComp)
+	if (!SkillComponent)
 		return;
 
-	if (!StatComp)
+	if (!StatComponent)
 		return;
 
-	if (SkillComp->HasFlag(RSGT_Flag_Dead))
+	if (SkillComponent->HasFlag(RSGT_Flag_Dead))
 		return;
 
-	if (SkillComp->HasFlag(RSGT_Flag_Immune))
+	if (SkillComponent->HasFlag(RSGT_Flag_Immune))
 		return;
 	
-	StatComp->AddValue(RSGT_Stat_CurrentHP, -Damage);
+	StatComponent->AddValue(RSGT_Stat_CurrentHP, -Damage);
 	
 	OnDamaged.Broadcast(this, Damage, InCaster);
 
-	if (StatComp->GetValue(RSGT_Stat_CurrentHP) <= 0.f)
+	if (StatComponent->GetValue(RSGT_Stat_CurrentHP) <= 0.f)
 	{
 		ApplyDie(InCaster);
 	}
 }
 
-void ARSCharacter::Launch(const FVector& Velocity, AActor* Caster)
-{
-	if (!SkillComp)
-		return;
-	
-	if (SkillComp->HasFlag(RSGT_Flag_Dead))
-		return;
-
-	if (SkillComp->HasFlag(RSGT_Flag_SuperArmor))
-		return;
-
-	LaunchCharacter(Velocity, true, false);
-}
-
 void ARSCharacter::ApplyDie(AActor* InCaster)
 {
-	if (!SkillComp)
+	if (!SkillComponent)
 		return;
 	
-	if (!StatComp)
+	if (!StatComponent)
 		return;
 	
-	SkillComp->AddFlag(RSGT_Flag_Dead);
-	SkillComp->ClearSkillEffectsByTypeTag(RSGT_SkillEffect_Type_Active, false);
+	SkillComponent->AddFlag(RSGT_Flag_Dead);
+	SkillComponent->ClearSkillEffectsByTypeTag(RSGT_SkillEffect_Type_Active, false);
 
-	StatComp->SetValue(RSGT_Stat_CurrentHP, 0.f);
+	StatComponent->SetValue(RSGT_Stat_CurrentHP, 0.f);
 	
 	StopMovementAll();
 	EnableMovementInput(false);
@@ -227,39 +213,27 @@ void ARSCharacter::ApplyDie(AActor* InCaster)
 	OnDie.Broadcast(this, InCaster);
 }
 
-float ARSCharacter::GetStat(const FGameplayTag& Tag) const
+void ARSCharacter::Launch(const FVector& Velocity, AActor* Caster)
 {
-	if (!StatComp)
-		return 0.f;
-
-	return StatComp->GetValue(Tag);
-}
-
-void ARSCharacter::SetStat(const FGameplayTag& Tag, float Value) const
-{
-	if (!StatComp)
+	if (!SkillComponent)
 		return;
-
-	StatComp->SetValue(Tag, Value);
-}
-
-void ARSCharacter::AddStat(const FGameplayTag& Tag, float Value) const
-{
-	if (!StatComp)
-		return;
-
-	StatComp->AddValue(Tag, Value);
-}
-
-const FGameplayTag& ARSCharacter::GetId() const
-{
-	if (!Preset.IsValid())
-	{
-		ensure(false);
-		return FGameplayTag::EmptyTag;
-	}
 	
-	return Preset->Id;
+	if (SkillComponent->HasFlag(RSGT_Flag_Dead))
+		return;
+
+	if (SkillComponent->HasFlag(RSGT_Flag_SuperArmor))
+		return;
+
+	LaunchCharacter(Velocity, true, false);
+}
+
+void ARSCharacter::StopMovementAll()
+{
+	StopMovementByCurve();
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		MovementComp->StopMovementImmediately();
+	}
 }
 
 void ARSCharacter::StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale)
@@ -286,15 +260,6 @@ void ARSCharacter::StopMovementByCurve()
 	MovementCurveScale = FVector::ZeroVector;
 }
 
-void ARSCharacter::StopMovementAll()
-{
-	StopMovementByCurve();
-	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
-	{
-		MovementComp->StopMovementImmediately();
-	}
-}
-
 void ARSCharacter::EnableMovementInput(bool bEnable)
 {
 	AController* MyController = GetController();
@@ -302,6 +267,11 @@ void ARSCharacter::EnableMovementInput(bool bEnable)
 		return;
 
 	MyController->SetIgnoreMoveInput(!bEnable);
+}
+
+FVector ARSCharacter::GetLastMovementDirection() const
+{
+	return LastMovementDirection;
 }
 
 void ARSCharacter::EnableGhost(bool bEnable)
@@ -313,9 +283,9 @@ void ARSCharacter::EnableGhost(bool bEnable)
 			Capsule->SetCollisionProfileName(TEXT("Spectator"));
 		}
 
-		if (HitBoxComp)
+		if (HitBoxComponent)
 		{
-			HitBoxComp->SetCollisionProfileName(TEXT("NoCollision"));
+			HitBoxComponent->SetCollisionProfileName(TEXT("NoCollision"));
 		}
 	}
 	else
@@ -325,14 +295,73 @@ void ARSCharacter::EnableGhost(bool bEnable)
 			Capsule->SetCollisionProfileName(TEXT("Pawn"));
 		}
 
-		if (HitBoxComp)
+		if (HitBoxComponent)
 		{
-			HitBoxComp->SetCollisionProfileName(TEXT("HitBox"));
+			HitBoxComponent->SetCollisionProfileName(TEXT("HitBox"));
 		}
 	}
 }
 
-float ARSCharacter::PlayAnimMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate, FName StartSectionName)
+float ARSCharacter::GetStat(const FGameplayTag& Tag) const
+{
+	if (!StatComponent)
+		return 0.f;
+
+	return StatComponent->GetValue(Tag);
+}
+
+void ARSCharacter::SetStat(const FGameplayTag& Tag, float Value) const
+{
+	if (!StatComponent)
+		return;
+
+	StatComponent->SetValue(Tag, Value);
+}
+
+void ARSCharacter::AddStat(const FGameplayTag& Tag, float Value) const
+{
+	if (!StatComponent)
+		return;
+
+	StatComponent->AddValue(Tag, Value);
+}
+
+bool ARSCharacter::UseSkillSlot(const FGameplayTag& Slot)
+{
+	if (!SkillComponent)
+		return false;
+
+	if (!Preset.IsValid())
+		return false;
+	
+	if (!Preset->SlotToSkillId.Contains(Slot))
+		return false;
+
+	return SkillComponent->TryCastSkill(Preset->SlotToSkillId[Slot]);
+}
+
+float ARSCharacter::PlayMontage(UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName)
+{
+	UAnimInstance * AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
+	if( AnimMontage && AnimInstance )
+	{
+		float const Duration = AnimInstance->Montage_Play(AnimMontage, InPlayRate);
+
+		if (Duration > 0.f)
+		{
+			if( StartSectionName != NAME_None )
+			{
+				AnimInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
+			}
+
+			return Duration;
+		}
+	}	
+
+	return 0.f;
+}
+
+float ARSCharacter::PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate, FName StartSectionName)
 {
 	UAnimInstance * AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
 	if( AnimMontage && AnimInstance )
@@ -356,44 +385,45 @@ float ARSCharacter::PlayAnimMontageWithEnd(UAnimMontage* AnimMontage, TFunction<
 	return 0.f;
 }
 
-FVector ARSCharacter::GetSocketLocation(FName SocketName) const
+const FGameplayTag& ARSCharacter::GetId() const
 {
-	if (UMeshComponent* MeshComp = FindComponentByClass<UMeshComponent>())
+	if (!Preset.IsValid())
 	{
-		return MeshComp->GetSocketLocation(SocketName);
+		ensure(false);
+		return FGameplayTag::EmptyTag;
 	}
-
-	return GetActorLocation();
+	
+	return Preset->Id;
 }
 
-void ARSCharacter::OnStatValueChanged(URSStatComponent* StatComponent, const FGameplayTag& Tag, float OldValue, float NewValue)
+void ARSCharacter::OnStatValueChanged(URSStatComponent* StatComp, const FGameplayTag& Tag, float OldValue, float NewValue)
 {
 	ensure(StatComp == StatComponent);
-	if (!StatComp)
+	if (!StatComponent)
 		return;
 
 	if (Tag.MatchesTagExact(RSGT_Stat_CurrentHP))
 	{
-		if (StatComp->GetValue(RSGT_Stat_CurrentHP) > StatComp->GetValue(RSGT_Stat_MaxHP))
+		if (StatComponent->GetValue(RSGT_Stat_CurrentHP) > StatComponent->GetValue(RSGT_Stat_MaxHP))
 		{
-			StatComp->SetValue(RSGT_Stat_CurrentHP, StatComp->GetValue(RSGT_Stat_MaxHP));
+			StatComponent->SetValue(RSGT_Stat_CurrentHP, StatComponent->GetValue(RSGT_Stat_MaxHP));
 		}
 
-		if (StatComp->GetValue(RSGT_Stat_CurrentHP) < 0)
+		if (StatComponent->GetValue(RSGT_Stat_CurrentHP) < 0)
 		{
-			StatComp->SetValue(RSGT_Stat_CurrentHP, 0);
+			StatComponent->SetValue(RSGT_Stat_CurrentHP, 0);
 		}
 	}
 	else if (Tag.MatchesTagExact(RSGT_Stat_CurrentMana))
 	{
-		if (StatComp->GetValue(RSGT_Stat_CurrentMana) > StatComp->GetValue(RSGT_Stat_MaxMana))
+		if (StatComponent->GetValue(RSGT_Stat_CurrentMana) > StatComponent->GetValue(RSGT_Stat_MaxMana))
 		{
-			StatComp->SetValue(RSGT_Stat_CurrentMana, StatComp->GetValue(RSGT_Stat_MaxMana));
+			StatComponent->SetValue(RSGT_Stat_CurrentMana, StatComponent->GetValue(RSGT_Stat_MaxMana));
 		}
 
-		if (StatComp->GetValue(RSGT_Stat_CurrentMana) < 0)
+		if (StatComponent->GetValue(RSGT_Stat_CurrentMana) < 0)
 		{
-			StatComp->SetValue(RSGT_Stat_CurrentMana, 0);
+			StatComponent->SetValue(RSGT_Stat_CurrentMana, 0);
 		}
 	}
 	else if (Tag.MatchesTagExact(RSGT_Stat_MovementSpeed))

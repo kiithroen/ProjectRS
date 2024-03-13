@@ -15,31 +15,31 @@ ARSProjectile::ARSProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
-	if (SphereComp)
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	if (SphereComponent)
 	{
-		SphereComp->InitSphereRadius(15.0f);
-		SphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		SphereComp->SetCollisionProfileName(TEXT("NoCollision"));
-		SphereComp->SetGenerateOverlapEvents(false);
-		SphereComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-		RootComponent = SphereComp;
+		SphereComponent->InitSphereRadius(15.0f);
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SphereComponent->SetCollisionProfileName(TEXT("NoCollision"));
+		SphereComponent->SetGenerateOverlapEvents(false);
+		SphereComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		RootComponent = SphereComponent;
 	}
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	if (MeshComp)
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	if (MeshComponent)
 	{
-		MeshComp->SetupAttachment(RootComponent);
-		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		MeshComp->SetCollisionProfileName(TEXT("NoCollision"));
-		MeshComp->SetGenerateOverlapEvents(false);
-		MeshComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+		MeshComponent->SetupAttachment(RootComponent);
+		MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		MeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
+		MeshComponent->SetGenerateOverlapEvents(false);
+		MeshComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	}
 
 	ProjectileMovementComp = CreateDefaultSubobject<URSProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	if (ProjectileMovementComp)
 	{
-		ProjectileMovementComp->SetUpdatedComponent(SphereComp);
+		ProjectileMovementComp->SetUpdatedComponent(SphereComponent);
 		ProjectileMovementComp->InitialSpeed = 3000.0f;
 		ProjectileMovementComp->MaxSpeed = 3000.0f;
 		ProjectileMovementComp->bRotationFollowsVelocity = true;
@@ -63,7 +63,7 @@ void ARSProjectile::Tick(float DeltaTime)
 	
 	Super::Tick(DeltaTime);
 
-	if (!SphereComp)
+	if (!SphereComponent)
 		return;
 
 	UWorld* World = GetWorld();
@@ -74,7 +74,7 @@ void ARSProjectile::Tick(float DeltaTime)
 	FRSTargetInfo_SphereArea TargetInfo;
 	TargetInfo.StartLocation = GetActorLocation();
 	TargetInfo.EndLocation = GetActorLocation();
-	TargetInfo.Radius = SphereComp->GetScaledSphereRadius();
+	TargetInfo.Radius = SphereComponent->GetScaledSphereRadius();
 	TargetInfo.TraceChannel = TraceChannel;
 	URSUtil::CollectTargets_SphereArea(this, TargetInfo, ActorsToIgnore, OutHitResults);
 	

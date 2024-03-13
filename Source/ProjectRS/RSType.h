@@ -44,6 +44,17 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_Type_Default);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_Type_Sub);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_Event_Input_ButtonA);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_Slot_MeleeAttack_1);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_Slot_RangeAttack_1);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_1);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_2);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_3);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_4);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_5);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_Begin);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_Tick);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_Skill_AnimNotify_ApplySkill_End);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(RSGT_SkillEffect_Id_Null);
 
@@ -130,10 +141,10 @@ struct PROJECTRS_API FRSTargetInfo_SocketTrace
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	FName SocketStart;
+	FName StartSocket;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	FName SocketEnd;
+	FName EndSocket;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
 	float Radius = 30.f;

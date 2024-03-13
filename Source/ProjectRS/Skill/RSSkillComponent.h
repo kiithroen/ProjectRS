@@ -37,7 +37,7 @@ public:
 	TArray<URSSkill*> FindSkillsByTypeTagsAny(const FGameplayTagContainer& Tags, bool bExact = true) const;
 	TArray<URSSkill*> FindSkillsByTypeTagsAll(const FGameplayTagContainer& Tags, bool bExact = true) const;
 	
-	void TryCastSkill(const FGameplayTag& Id);
+	bool TryCastSkill(const FGameplayTag& Id);
 	void StopSkill(const FGameplayTag& Id);
 	bool CanActivateSkill(const FGameplayTag& Id) const;
 	

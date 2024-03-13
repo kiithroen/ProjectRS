@@ -20,7 +20,7 @@ void URSSkillEffect_Heal::Do(float DeltaTime)
 	if (!IsValid(OwnerActor))
 		return;
 
-	IRSCombatInterface* OwnerCombat = Cast<ARSCharacter>(OwnerActor);
+	IRSCombatInterface* OwnerCombat = Cast<IRSCombatInterface>(OwnerActor);
 	if (!OwnerCombat)
 		return;
 	

@@ -105,8 +105,8 @@ void URSUtil::CollectTargets_SocketTrace(const AActor* Actor, const FRSTargetInf
 {
 	const UMeshComponent* MeshComp = Actor->FindComponentByClass<UMeshComponent>();
 	
-	const FVector SocketStartLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.SocketStart) : Actor->GetActorLocation();
-	const FVector SocketEndLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.SocketEnd) : Actor->GetActorLocation();
+	const FVector SocketStartLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.StartSocket) : Actor->GetActorLocation();
+	const FVector SocketEndLocation = MeshComp ? MeshComp->GetSocketLocation(TargetInfo.EndSocket) : Actor->GetActorLocation();
 	const FVector WorldDirection = UKismetMathLibrary::GetDirectionUnitVector(SocketStartLocation, SocketEndLocation);
 	const FVector StartLocation = SocketStartLocation + WorldDirection * TargetInfo.Radius;
 	const FVector EndLocation = SocketEndLocation - WorldDirection * TargetInfo.Radius;

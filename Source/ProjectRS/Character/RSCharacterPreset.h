@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "RS", meta = (Categories = "Skill.Id"))
 	TArray<FGameplayTag> DefaultSkillItemIds;
 
+	UPROPERTY(EditDefaultsOnly, Category = "RS", meta = (Categories = "Skill", ForceInlineRow))
+	TMap<FGameplayTag, FGameplayTag> SlotToSkillId;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "RS")
 	TSoftObjectPtr<UAnimMontage> HitMontage;
 	

@@ -102,7 +102,7 @@ void ARSMonster::ApplyDamage(float Damage, AActor* Caster)
 		if (UAnimMontage* Montage = Preset->HitMontage.LoadSynchronous())
 		{
 			EnableMovementInput(false);
-			PlayAnimMontageWithEnd(Montage, [this](UAnimMontage*,bool)
+			PlayMontageWithEnd(Montage, [this](UAnimMontage*,bool)
 			{
 				EnableMovementInput(true);
 			});

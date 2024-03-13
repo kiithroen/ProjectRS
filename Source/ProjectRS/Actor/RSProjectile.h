@@ -41,10 +41,10 @@ private:
 	void ClearExplosionTimer();
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USphereComponent> SphereComp;
+	TObjectPtr<USphereComponent> SphereComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> MeshComp;
+	TObjectPtr<UStaticMeshComponent> MeshComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSProjectileMovementComponent> ProjectileMovementComp;

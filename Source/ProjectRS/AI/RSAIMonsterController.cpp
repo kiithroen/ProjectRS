@@ -35,7 +35,11 @@ void ARSAIMonsterController::Tick(float DeltaTime)
 
 void ARSAIMonsterController::OnUpdateAI()
 {
-	IRSCombatInterface* OwnerCombat = Cast<IRSCombatInterface>(GetCharacter());
+	APawn* OwnerPawn = GetPawn();
+	if (!IsValid(OwnerPawn))
+		return;
+	
+	IRSCombatInterface* OwnerCombat = Cast<IRSCombatInterface>(OwnerPawn);
 	if (!OwnerCombat)
 		return;
 	
@@ -49,10 +53,19 @@ void ARSAIMonsterController::OnUpdateAI()
 	UPathFollowingComponent* PathFollowingComp = GetPathFollowingComponent();
 	if (!PathFollowingComp)
 		return;
-		
-	if (PathFollowingComp->GetStatus() == EPathFollowingStatus::Idle)
+
+	constexpr float MeleeAttackRange = 150.f;
+	if (FVector::DistSquared2D(OwnerPawn->GetActorLocation(), Hero->GetActorLocation()) <= MeleeAttackRange * MeleeAttackRange)
 	{
-		MoveToActor(Hero, 100.f);
+		StopMovement();
+		OwnerCombat->UseSkillSlot(RSGT_Skill_Slot_MeleeAttack_1);
+	}
+	else
+	{
+		if (PathFollowingComp->GetStatus() == EPathFollowingStatus::Idle)
+		{
+			MoveToActor(Hero, 50.f);
+		}
 	}
 }
 

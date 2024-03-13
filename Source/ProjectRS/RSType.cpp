@@ -27,6 +27,17 @@ UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Type_Default, "Skill.Type.Default");
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Type_Sub, "Skill.Type.Sub");
 
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Event_Input_ButtonA, "Skill.Event.Input.ButtonA");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Slot_MeleeAttack_1, "Skill.Slot.MeleeAttack.1");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Slot_RangeAttack_1, "Skill.Slot.RangeAttack.1");
+
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_1, "Skill.AnimNotify.ApplySkill.1");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_2, "Skill.AnimNotify.ApplySkill.2");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_3, "Skill.AnimNotify.ApplySkill.3");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_4, "Skill.AnimNotify.ApplySkill.4");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_5, "Skill.AnimNotify.ApplySkill.5");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_Begin, "Skill.AnimNotify.ApplySkill.Begin");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_Tick, "Skill.AnimNotify.ApplySkill.Tick");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_AnimNotify_ApplySkill_End, "Skill.AnimNotify.ApplySkill.End");
 
 UE_DEFINE_GAMEPLAY_TAG(RSGT_SkillEffect_Id_Null, "SkillEffect.Id.Null");
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
+#include "Interface/RSAnimInterface.h"
 #include "Interface/RSCombatInterface.h"
 #include "RSCharacter.generated.h"
 
@@ -22,7 +23,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnDie, ARSCharacter*, AActor*);
  * 
  */
 UCLASS(Abstract)
-class PROJECTRS_API ARSCharacter : public ACharacter, public IRSCombatInterface
+class PROJECTRS_API ARSCharacter : public ACharacter, public IRSCombatInterface, public IRSAnimInterface
 {
 	GENERATED_BODY()
 	
@@ -40,37 +41,38 @@ public:
 	virtual void ApplyDie(AActor* Caster) override;
 	
 	virtual void Launch(const FVector& Velocity, AActor* Caster) override;
+	
+	virtual void StopMovementAll() override;
+	virtual void StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale) override;
+	virtual void StopMovementByCurve() override;
+	virtual void EnableMovementInput(bool bEnable) override;
+	virtual FVector GetLastMovementDirection() const override;
+
+	virtual void EnableGhost(bool bEnable) override;
 
 	virtual float GetStat(const FGameplayTag& Tag) const override;
 	virtual void SetStat(const FGameplayTag& Tag, float Value) const override;
 	virtual void AddStat(const FGameplayTag& Tag, float Value) const override;
 
+	virtual bool UseSkillSlot(const FGameplayTag& Slot) override;
+	
+	virtual float PlayMontage(UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
+	virtual float PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
+	
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsDead"))
 	bool K2_IsDead() const { return IsDead(); }
 	
 	const FGameplayTag& GetId() const;
-	FVector GetLastMovementDirection() const { return LastMovementDirection; }
 	
 	void Init(URSCharacterPreset* InPreset);
-	
-	void StopMovementAll();
-	void StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale);
-	void StopMovementByCurve();
-	void EnableMovementInput(bool bEnable);
 
-	void EnableGhost(bool bEnable);
-
-	float PlayAnimMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	
-	FVector GetSocketLocation(FName SocketName) const;
-
-	FORCEINLINE URSHitBoxComponent* GetHitBox() const { return HitBoxComp; }
-	FORCEINLINE URSSkillComponent* GetSkill() const { return SkillComp; }
-	FORCEINLINE URSStatComponent* GetStat() const { return StatComp; }
+	FORCEINLINE URSHitBoxComponent* GetHitBox() const { return HitBoxComponent; }
+	FORCEINLINE URSSkillComponent* GetSkill() const { return SkillComponent; }
+	FORCEINLINE URSStatComponent* GetStat() const { return StatComponent; }
 
 protected:
 	UFUNCTION()
-	void OnStatValueChanged(URSStatComponent* StatComponent, const FGameplayTag& Tag, float OldValue, float NewValue);
+	void OnStatValueChanged(URSStatComponent* StatComp, const FGameplayTag& Tag, float OldValue, float NewValue);
 
 	void UpdateMovementByCurve(float DeltaTime);
 
@@ -80,13 +82,13 @@ public:
 	FRSOnDie OnDie;
 	
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<URSHitBoxComponent> HitBoxComp;
+	TObjectPtr<URSHitBoxComponent> HitBoxComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<URSSkillComponent> SkillComp;
+	TObjectPtr<URSSkillComponent> SkillComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<URSStatComponent> StatComp;
+	TObjectPtr<URSStatComponent> StatComponent;
 	
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	bool bMovementByCurve = false;

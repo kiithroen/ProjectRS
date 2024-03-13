@@ -21,7 +21,7 @@ struct PROJECTRS_API FRSBaseItem : public FTableRowBase
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditDefaultsOnly, Category = "RS", meta = (Categories = "Skill.Id"))
+	UPROPERTY(EditDefaultsOnly, Category = "RS")
 	FGameplayTag Id;
 	
 	UPROPERTY(VisibleAnywhere, Category = "RS")

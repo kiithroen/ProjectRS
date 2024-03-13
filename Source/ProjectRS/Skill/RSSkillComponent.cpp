@@ -182,16 +182,18 @@ bool URSSkillComponent::CanActivateSkill(const FGameplayTag& Id) const
 	return Skill->CanActivate();
 }
 
-void URSSkillComponent::TryCastSkill(const FGameplayTag& Id)
+bool URSSkillComponent::TryCastSkill(const FGameplayTag& Id)
 {
 	URSSkill* Skill = FindSkill(Id);
 	if (!Skill)
-		return;
+		return false;
 
 	if (!Skill->CanActivate())
-		return;
+		return false;
 
 	Skill->OnBegin();
+
+	return true;
 }
 
 void URSSkillComponent::StopSkill(const FGameplayTag& Id)
@@ -207,10 +209,7 @@ void URSSkillComponent::SendEvent(const FGameplayTag& EventTag)
 {
 	for (auto& Skill : Skills)
 	{
-		if (!Skill)
-			continue;
-
-		if (Skill->IsActive())
+		if (Skill && Skill->IsActive())
 		{
 			Skill->OnEvent(EventTag);
 		}
