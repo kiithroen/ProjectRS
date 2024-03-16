@@ -525,6 +525,7 @@ void URSSkillComponent::UpdateSkillEffects(float DeltaTime)
 	for (auto& SkillEffect : ExpiredSkillEffects)
 	{
 		SkillEffect->OnRemove();
+		SkillEffect->Release();
 		ActiveSkillEffects.Remove(SkillEffect);
 	}
 	ExpiredSkillEffects.Reset();

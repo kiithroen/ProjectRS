@@ -2,8 +2,11 @@
 
 
 #include "GameFramework/RSAssetManager.h"
+
+#include "Common/RSObjectPool.h"
 #include "Data/RSGlobalData.h"
 #include "Setting/RSGameSetting.h"
+#include "Skill/RSSkillEffect_Damage.h"
 
 const FPrimaryAssetType	URSAssetManager::FieldItemType = TEXT("RSFieldItemData");
 const FPrimaryAssetType	URSAssetManager::UsableItemType = TEXT("RSUsableItemData");
@@ -34,6 +37,16 @@ URSGlobalData* URSAssetManager::LoadGlobalData()
 		if (const URSGameSetting* Setting = URSGameSetting::Get())
 		{
 			GlobalData = Setting->GlobalDataPath.LoadSynchronous();
+			if (GlobalData)
+			{
+				for (auto& DataTable : GlobalData->DataTables)
+				{
+					if (const UScriptStruct* RowStruct = DataTable->GetRowStruct())
+					{
+						GlobalDataTables.Emplace(RowStruct->GetFName(), DataTable);
+					}
+				}
+			}
 		}
 	}
 
@@ -48,27 +61,22 @@ URSGlobalData* URSAssetManager::GetOrLoadGlobalData()
 	return GlobalData;
 }
 
-void URSAssetManager::LoadGlobalDataTables()
+URSObjectPool& URSAssetManager::GetObjectPool()
 {
-	GlobalDataTables.Reset();
+	ensure(ObjectPool);
+	return *ObjectPool;
+}
 
-	if (!GlobalData)
-	{
-		ensure(false);
-		return;
-	}
-	
-	for (auto& DataTable : GlobalData->DataTables)
-	{
-		if (const UScriptStruct* RowStruct = DataTable->GetRowStruct())
-		{
-			GlobalDataTables.Emplace(RowStruct->GetFName(), DataTable);
-		}
-	}
+void URSAssetManager::InitObjectPool()
+{
+	ObjectPool = NewObject<URSObjectPool>();
+	ObjectPool->SetDefaultSize(4, 16, 2);
+	ObjectPool->Initialize<URSSkillEffect_Damage>(8, 64, 4);
 }
 
 void URSAssetManager::OnInitGameInstance()
 {
 	LoadGlobalData();
-	LoadGlobalDataTables();
+
+	InitObjectPool();
 }

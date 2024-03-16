@@ -13,7 +13,9 @@ class PROJECTRS_API URSSkillEffect_Heal : public URSSkillEffect
 	GENERATED_BODY()
 	
 public:
-	URSSkillEffect_Heal();
+	virtual URSSkillEffect* Clone() const override;
+	virtual void Release() override;
+	virtual void CopyFrom(const URSSkillEffect* Other) override;
 
 	virtual void Do(float DeltaTime) override;
 

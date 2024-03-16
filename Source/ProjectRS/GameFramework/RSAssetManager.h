@@ -7,6 +7,7 @@
 #include "RSType.h"
 #include "RSAssetManager.generated.h"
 
+class URSObjectPool;
 class URSGlobalData;
 class URSDataTableManager;
 
@@ -87,16 +88,20 @@ public:
 	}
 	
 	URSGlobalData* GetOrLoadGlobalData();
-	void LoadGlobalDataTables();
+	URSObjectPool& GetObjectPool();
+	void InitObjectPool();
 
 	void OnInitGameInstance();
 
 private:
 	URSGlobalData* LoadGlobalData();
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TObjectPtr<URSGlobalData> GlobalData;
 	
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<UDataTable>> GlobalDataTables;
+
+	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	TObjectPtr<URSObjectPool> ObjectPool;
 };

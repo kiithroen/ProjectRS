@@ -21,7 +21,11 @@ public:
 	URSSkillEffect();
 	
 	virtual UWorld* GetWorld() const override;
+	
 	virtual URSSkillEffect* Clone() const;
+	virtual void Release();
+	virtual void CopyFrom(const URSSkillEffect* Other);
+	virtual void Init(URSSkillComponent* InComponent);
 	
 	virtual void Do(float DeltaTime);
 	virtual void OnAdd();
@@ -30,7 +34,6 @@ public:
 	virtual void OnChangeStack(int32 OldCount, int32 NewCount);
 	virtual void OnEvent(const FGameplayTag& EventTag);
 	
-	void Init(URSSkillComponent* InComponent);
 	void Tick(float DeltaTime);
 
 	void AddCaster(AActor* Caster);
@@ -71,7 +74,7 @@ public:
 	void ResetRemainTime();
 	
 	bool IsExpired() const;
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "SkillEffect")
 	int32 RequiredLevel = 1;

@@ -16,9 +16,13 @@ class PROJECTRS_API URSSkillEffect_Damage : public URSSkillEffect
 	GENERATED_BODY()
 	
 public:
-	virtual void Do(float DeltaTime) override;
+	virtual URSSkillEffect* Clone() const override;
+	virtual void Release() override;
+	virtual void CopyFrom(const URSSkillEffect* Other) override;
 
-public:
+	virtual void Do(float DeltaTime) override;
+	
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FScalableFloat BaseDamage = 1.f;
 

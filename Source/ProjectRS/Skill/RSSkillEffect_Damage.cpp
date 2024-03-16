@@ -5,8 +5,42 @@
 #include "Component/RSStatComponent.h"
 #include "Skill/RSSkillComponent.h"
 #include "Character/RSCharacter.h"
+#include "Common/RSObjectPool.h"
 #include "Common/RSUtil.h"
+#include "GameFramework/RSAssetManager.h"
 #include "Kismet/KismetMathLibrary.h"
+
+URSSkillEffect* URSSkillEffect_Damage::Clone() const
+{
+	if (URSSkillEffect_Damage* CloneSkillEffect = URSAssetManager::Get().GetObjectPool().Pop<URSSkillEffect_Damage>())
+	{
+		CloneSkillEffect->CopyFrom(this);
+		return CloneSkillEffect;
+	}
+
+	ensure(false);
+	return nullptr;
+}
+
+void URSSkillEffect_Damage::Release()
+{
+	URSAssetManager::Get().GetObjectPool().Push<URSSkillEffect_Damage>(this);
+}
+
+void URSSkillEffect_Damage::CopyFrom(const URSSkillEffect* Other)
+{
+	Super::CopyFrom(Other);
+
+	if (const URSSkillEffect_Damage* OtherDamage = Cast<const URSSkillEffect_Damage>(Other))
+	{
+		BaseDamage = OtherDamage->BaseDamage;
+		AttackDamageMultiplier = OtherDamage->AttackDamageMultiplier;
+		RandomDamageMultiplier = OtherDamage->RandomDamageMultiplier;
+		bIgnoreArmor = OtherDamage->bIgnoreArmor;
+		bAlwaysCritical = OtherDamage->bAlwaysCritical;
+		LaunchSpeed = OtherDamage->LaunchSpeed;
+	}
+}
 
 void URSSkillEffect_Damage::Do(float DeltaTime)
 {

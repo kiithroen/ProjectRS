@@ -2,6 +2,7 @@
 
 #include "Skill/RSSkillEffect.h"
 
+#include "PropertyPathHelpers.h"
 #include "Skill/RSSkillComponent.h"
 
 URSSkillEffect::URSSkillEffect()
@@ -20,8 +21,40 @@ UWorld* URSSkillEffect::GetWorld() const
 
 URSSkillEffect* URSSkillEffect::Clone() const
 {
-	// TODO : Object Pool
-	return DuplicateObject<URSSkillEffect>(this, GetOwnerComponent());
+	ensure(false);
+	return nullptr;
+}
+
+void URSSkillEffect::Release()
+{
+}
+
+void URSSkillEffect::CopyFrom(const URSSkillEffect* Other)
+{
+	if (Other)
+	{
+		RequiredLevel = Other->RequiredLevel;
+		TypeTags = Other->TypeTags;
+		StackGroupTag = Other->StackGroupTag;
+		ExecutionType = Other->ExecutionType;
+		Grade = Other->Grade;
+		MaxRepeatCount = Other->MaxRepeatCount;
+		MaxStackCount = Other->MaxStackCount;
+		DurationTime = Other->DurationTime;
+		ChanceToAdd = Other->ChanceToAdd;
+	}
+}
+
+void URSSkillEffect::Init(URSSkillComponent* InComponent)
+{
+	OwnerComponent = InComponent;
+	Caster.Reset();
+	Causer.Reset();
+	HitResult.Reset();
+	Level = 0;
+	RepeatCount = 0;
+	StackCount = 0;
+	RemainTime = 0.f;
 }
 
 void URSSkillEffect::Do(float DeltaTime)
@@ -74,13 +107,6 @@ void URSSkillEffect::OnChangeStack(int32 OldCount, int32 NewCount)
 
 void URSSkillEffect::OnEvent(const FGameplayTag& EventTag)
 {
-}
-
-void URSSkillEffect::Init(URSSkillComponent* InComponent)
-{
-	OwnerComponent = InComponent;
-	RepeatCount = 0;
-	StackCount = 0;
 }
 
 void URSSkillEffect::Tick(float DeltaTime)
