@@ -11,7 +11,6 @@
 
 ARSAIMonsterController::ARSAIMonsterController()
 {
-	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ARSAIMonsterController::OnPossess(APawn* InPawn)
@@ -26,11 +25,6 @@ void ARSAIMonsterController::OnUnPossess()
 	Super::OnUnPossess();
 	
 	ClearAITimer();
-}
-
-void ARSAIMonsterController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void ARSAIMonsterController::OnUpdateAI()

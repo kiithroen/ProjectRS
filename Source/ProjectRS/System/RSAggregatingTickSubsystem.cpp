@@ -3,21 +3,27 @@
 
 #include "RSAggregatingTickSubsystem.h"
 
-FRSComponentCollectionTickFucntion::FRSComponentCollectionTickFucntion()
-{
-}
 
-
-void URSAggregatingTickSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+void FRSActorCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
 {
-	check(!bInitialized);
-	bInitialized = true;
-}
+	for (auto& Actor : ExpiredTickingActors)
+	{
+		TickingActors.RemoveSingleSwap(Actor);
+	}
+	ExpiredTickingActors.Reset();
 
-void URSAggregatingTickSubsystem::Deinitialize()
-{
-	check(bInitialized);
-	bInitialized = false;
+	TickingActors.Append(PendingTickingActors);
+	PendingTickingActors.Reset();
+
+	TickingActors.RemoveAllSwap([](const TWeakObjectPtr<AActor>& Actor)
+	{
+		return !Actor.IsValid();
+	});
+
+	for (auto& Actor : TickingActors)
+	{
+		Actor->Tick(DeltaTime);
+	}
 }
 
 void FRSComponentCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
@@ -40,6 +46,57 @@ void FRSComponentCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick
 	{
 		Component->TickComponent(DeltaTime, TickType, nullptr);
 	}
+}
+
+void URSAggregatingTickSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	check(!bInitialized);
+	bInitialized = true;
+}
+
+void URSAggregatingTickSubsystem::Deinitialize()
+{
+	check(bInitialized);
+	bInitialized = false;
+}
+
+void URSAggregatingTickSubsystem::RegisterActor(AActor* Actor, ETickingGroup TickGroup)
+{
+	UClass* ActorClass = Actor->GetClass();
+	if (!ActorClass)
+	{
+		ensure(false);
+		return;
+	}
+	
+	if (!ActorCollectionTickFunctionMap.Contains(ActorClass))
+	{
+		TSharedPtr<FRSActorCollectionTickFucntion> ActorCollectionTickFucntion = MakeShareable(new FRSActorCollectionTickFucntion);
+		ActorCollectionTickFucntion->TickGroup = TickGroup;
+		
+		ActorCollectionTickFucntion->RegisterTickFunction(Actor->GetLevel());
+		ActorCollectionTickFunctionMap.Add(ActorClass, ActorCollectionTickFucntion);
+	}
+	
+	ActorCollectionTickFunctionMap[ActorClass]->AddActor(Actor);
+}
+
+void URSAggregatingTickSubsystem::UnRegisterActor(AActor* Actor)
+{
+	UClass* ActorClass = Actor->GetClass();
+	if (!ActorClass)
+	{
+		ensure(false);
+		return;
+	}
+	
+	if (!ActorCollectionTickFunctionMap.Contains(ActorClass))
+	{
+		ensure(false);
+		return;
+	}
+	
+	ActorCollectionTickFunctionMap[ActorClass]->RemoveActor(Actor);
 }
 
 void URSAggregatingTickSubsystem::RegisterComponent(UActorComponent* ActorComponent, ETickingGroup TickGroup)

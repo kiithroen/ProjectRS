@@ -38,11 +38,11 @@ void URSSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		AggregatingTickSubsystem->UnRegisterComponent(this);
 	}
-	
-	Super::EndPlay(EndPlayReason);
 
 	OnFlagAdded.Clear();
 	OnFlagRemoved.Clear();
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void URSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

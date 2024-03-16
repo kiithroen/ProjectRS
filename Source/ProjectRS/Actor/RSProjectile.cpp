@@ -10,6 +10,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/RSAggregatingTickSubsystem.h"
 
 ARSProjectile::ARSProjectile()
 {
@@ -54,6 +55,16 @@ void ARSProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		PrimaryActorTick.UnRegisterTickFunction();
+		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
+	}
+	
 	PrevLocation = GetActorLocation();
 }
 
@@ -104,10 +115,21 @@ void ARSProjectile::Tick(float DeltaTime)
 
 void ARSProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		AggregatingTickSubsystem->UnRegisterActor(this);
+	}
+	
 	ClearExplosionTimer();
 
 	OnProjectileHit.Clear();
 	OnProjectileExplosion.Clear();
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void ARSProjectile::SetCaster(AActor* InCaster)

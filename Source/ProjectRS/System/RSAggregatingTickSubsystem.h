@@ -7,11 +7,45 @@
 #include "RSAggregatingTickSubsystem.generated.h"
 
 USTRUCT()
+struct FRSActorCollectionTickFucntion : public FTickFunction
+{
+	GENERATED_BODY()
+
+	FRSActorCollectionTickFucntion() {}
+	
+	void AddActor(AActor* AActor)
+	{
+		PendingTickingActors.Emplace(AActor);
+	}
+
+	void RemoveActor(AActor* AActor)
+	{
+		ExpiredTickingActors.Emplace(AActor);
+	}
+	
+	virtual void ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)	override;
+	
+	TArray<TWeakObjectPtr<AActor>> TickingActors;
+	TArray<TWeakObjectPtr<AActor>> PendingTickingActors;
+	TArray<TWeakObjectPtr<AActor>> ExpiredTickingActors;
+};
+
+template<>
+struct TStructOpsTypeTraits<FRSActorCollectionTickFucntion> : public TStructOpsTypeTraitsBase2<FRSActorCollectionTickFucntion>
+{
+	enum
+	{
+		WithCopy = false
+	};
+};
+
+
+USTRUCT()
 struct FRSComponentCollectionTickFucntion : public FTickFunction
 {
 	GENERATED_BODY()
 
-	FRSComponentCollectionTickFucntion();
+	FRSComponentCollectionTickFucntion() {}
 	
 	void AddComponent(UActorComponent* ActorComponent)
 	{
@@ -52,11 +86,15 @@ public:
 	virtual void Deinitialize() override;
 	
 	bool IsInitialized() const { return bInitialized; }
+
+	void RegisterActor(AActor* Actor, ETickingGroup TickGroup);
+	void UnRegisterActor(AActor* Actor);
 	
 	void RegisterComponent(UActorComponent* ActorComponent, ETickingGroup TickGroup);
 	void UnRegisterComponent(UActorComponent* ActorComponent);
 
 private:
+	TMap<UClass*, TSharedPtr<FRSActorCollectionTickFucntion>> ActorCollectionTickFunctionMap;
 	TMap<UClass*, TSharedPtr<FRSComponentCollectionTickFucntion>> ComponentCollectionTickFunctionMap;
 	bool bInitialized = false;
 };

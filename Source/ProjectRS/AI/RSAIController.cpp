@@ -7,6 +7,7 @@
 
 ARSAIController::ARSAIController()
 {
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ARSAIController::BeginPlay()

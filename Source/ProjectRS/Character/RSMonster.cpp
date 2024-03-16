@@ -74,9 +74,9 @@ void ARSMonster::BeginPlay()
 
 void ARSMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
-
 	ClearHitStopTimer();
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void ARSMonster::Tick(float DeltaTime)

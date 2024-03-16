@@ -7,6 +7,7 @@
 #include "Character/RSHero.h"
 #include "Skill/RSSkillComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/RSAggregatingTickSubsystem.h"
 
 ARSFieldItem::ARSFieldItem()
 {
@@ -26,6 +27,16 @@ ARSFieldItem::ARSFieldItem()
 void ARSFieldItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		PrimaryActorTick.UnRegisterTickFunction();
+		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
+	}
 }
 
 void ARSFieldItem::Tick(float DeltaTime)
@@ -58,6 +69,20 @@ void ARSFieldItem::Tick(float DeltaTime)
 		const FVector MoveLocation = ItemLocation + (Direction.GetSafeNormal() * MoveDistance);
 		SetActorLocation(MoveLocation);
 	}
+}
+
+void ARSFieldItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	const UWorld* World = GetWorld();
+	if (!World)
+		return;
+	
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	{
+		AggregatingTickSubsystem->UnRegisterActor(this);
+	}
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void ARSFieldItem::OnHit(AActor* Actor)
