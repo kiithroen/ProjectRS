@@ -80,13 +80,13 @@ private:
 	TArray<TObjectPtr<AActor>> TargetActors;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TSet<TObjectPtr<URSSkill>> Skills;
+	TArray<TObjectPtr<URSSkill>> Skills;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TSet<TObjectPtr<URSSkillEffect>> ActiveSkillEffects;
+	TArray<TObjectPtr<URSSkillEffect>> ActiveSkillEffects;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TSet<TObjectPtr<URSSkillEffect>> PendingSkillEffects;
+	TArray<TObjectPtr<URSSkillEffect>> PendingSkillEffects;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	TArray<URSSkillEffect*> ExpiredSkillEffects;

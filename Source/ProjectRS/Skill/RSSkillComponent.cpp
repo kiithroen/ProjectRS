@@ -91,7 +91,7 @@ void URSSkillComponent::UnEquipSkill(const FGameplayTag& Id)
 		return;
 
 	Skill->OnEquip();
-	Skills.Remove(Skill);
+	Skills.RemoveSingleSwap(Skill);
 }
 
 void URSSkillComponent::ClearSkills()
@@ -526,7 +526,7 @@ void URSSkillComponent::UpdateSkillEffects(float DeltaTime)
 	{
 		SkillEffect->OnRemove();
 		SkillEffect->Release();
-		ActiveSkillEffects.Remove(SkillEffect);
+		ActiveSkillEffects.RemoveSingleSwap(SkillEffect);
 	}
 	ExpiredSkillEffects.Reset();
 }
