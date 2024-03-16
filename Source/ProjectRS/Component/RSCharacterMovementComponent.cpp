@@ -3,7 +3,6 @@
 
 #include "RSCharacterMovementComponent.h"
 
-#include "RSType.h"
 #include "Curves/CurveVector.h"
 
 URSCharacterMovementComponent::URSCharacterMovementComponent()

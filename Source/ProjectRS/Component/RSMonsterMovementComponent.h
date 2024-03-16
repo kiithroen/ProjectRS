@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "RSCharacterMovementComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "RSMonsterMovementComponent.generated.h"
 
 

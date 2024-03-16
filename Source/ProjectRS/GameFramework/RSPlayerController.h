@@ -6,7 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
-#include "RSType.h"
 #include "RSPlayerController.generated.h"
 
 class UInputMappingContext;

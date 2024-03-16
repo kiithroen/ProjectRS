@@ -6,7 +6,6 @@
 #include "RSCharacterPreset.h"
 #include "Common/RSUtil.h"
 #include "Component/RSHeroMovementComponent.h"
-#include "GameFramework/RSAssetManager.h"
 
 ARSHero* ARSHero::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {

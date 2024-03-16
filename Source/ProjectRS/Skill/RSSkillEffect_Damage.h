@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Skill/RSSkillEffect.h"
-#include "RSType.h"
 #include "ScalableFloat.h"
 #include "RSSkillEffect_Damage.generated.h"
 

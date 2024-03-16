@@ -2,7 +2,6 @@
 
 
 #include "RSType.h"
-#include "GameFramework/Character.h"
 
 DEFINE_LOG_CATEGORY(LogRS);
 

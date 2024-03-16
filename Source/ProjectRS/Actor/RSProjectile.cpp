@@ -9,7 +9,6 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/GameplayStatics.h"
 #include "System/RSAggregatingTickSubsystem.h"
 
 ARSProjectile::ARSProjectile()

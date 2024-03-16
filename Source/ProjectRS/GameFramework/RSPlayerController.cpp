@@ -4,8 +4,8 @@
 #include "GameFramework/RSPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "RSType.h"
 #include "Character/RSCharacter.h"
-#include "Skill/RSSkillComponent.h"
 
 ARSPlayerController::ARSPlayerController()
 {

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "RSSkill.h"
-#include "ScalableFloat.h"
 #include "RSSkill_MeleeAttack.generated.h"
 
 class ARSProjectile;
@@ -45,7 +44,7 @@ protected:
 
 private:
 	UPROPERTY(Transient)
-	TArray<AActor*> ActorsToIgnore;
+	TArray<TObjectPtr<AActor>> ActorsToIgnore;
 	
 	bool bTraceMeleeAttack = false;
 };

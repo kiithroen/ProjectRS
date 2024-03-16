@@ -475,11 +475,6 @@ URSSkillEffect* URSSkillComponent::FindSkillEffectByStackGroupTag(const FGamepla
 	return nullptr;
 }
 
-void URSSkillComponent::ClearTargetActors()
-{
-	TargetActors.Reset();
-}
-
 void URSSkillComponent::UpdateSkills(float DeltaTime)
 {
 	for (auto& Skill : Skills)

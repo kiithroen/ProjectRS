@@ -102,6 +102,6 @@ private:
 	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<UDataTable>> GlobalDataTables;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TObjectPtr<URSObjectPool> ObjectPool;
 };

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "RSBaseItem.h"
-#include "GameFramework/RSAssetManager.h"
 #include "RSTokenItem.generated.h"
 
 

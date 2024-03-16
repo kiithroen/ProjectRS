@@ -65,8 +65,6 @@ public:
 	TArray<URSSkillEffect*> FindSkillEffectsByTypeTagsAny(const FGameplayTagContainer& Tags, bool bExact = true) const;
 	TArray<URSSkillEffect*> FindSkillEffectsByTypeTagsAll(const FGameplayTagContainer& Tags, bool bExact = true) const;
 	
-	void ClearTargetActors();
-	
 private:
 	void UpdateSkills(float DeltaTime);
 	void UpdateSkillEffects(float DeltaTime);
@@ -77,9 +75,6 @@ public:
 
 private:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TArray<TObjectPtr<AActor>> TargetActors;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	TArray<TObjectPtr<URSSkill>> Skills;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
@@ -89,7 +84,7 @@ private:
 	TArray<TObjectPtr<URSSkillEffect>> PendingSkillEffects;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TArray<URSSkillEffect*> ExpiredSkillEffects;
+	TArray<TObjectPtr<URSSkillEffect>> ExpiredSkillEffects;
 	
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	FGameplayTagContainer Flags;

@@ -94,7 +94,7 @@ void URSSkill::OnUnEquip()
 {
 	for (const auto& SkillEffect : EquippedSkillEffects)
 	{
-		OwnerComponent->RemoveSkillEffect(SkillEffect);
+		OwnerComponent->RemoveSkillEffect(SkillEffect.Get());
 	}
 
 	EquippedSkillEffects.Reset();

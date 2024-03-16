@@ -89,7 +89,7 @@ protected:
 	
 private:
 	TWeakObjectPtr<URSSkillComponent> OwnerComponent;
-	TArray<TObjectPtr<URSSkillEffect>> EquippedSkillEffects;
+	TArray<TWeakObjectPtr<URSSkillEffect>> EquippedSkillEffects;
 
 	int32 Level = 0;
 	double ElapsedTime = 0;
