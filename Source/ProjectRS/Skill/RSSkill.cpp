@@ -39,7 +39,7 @@ bool URSSkill::CanActivate() const
 	return true;
 }
 
-void URSSkill::OnUpdate(float DeltaTime)
+void URSSkill::Do(float DeltaTime)
 {
 }
 
@@ -121,11 +121,7 @@ void URSSkill::Tick(float DeltaTime)
 	
 	if (IsActive())
 	{
-		OnUpdate(DeltaTime);
-		if (!IsActive())
-		{
-			OnEnd();
-		}	
+		Do(DeltaTime);
 	}
 }
 
@@ -301,9 +297,11 @@ bool URSSkill::IsAutoCast() const
 	return bAutoCast;
 }
 
-void URSSkill::Deactivate()
+void URSSkill::EndSkill()
 {
 	bActive = false;
+
+	OnEnd();
 }
 
 bool URSSkill::IsActive() const

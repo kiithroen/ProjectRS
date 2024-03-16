@@ -28,7 +28,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	void OnInputMove(const FInputActionValue& Value);
-	void OnInputButtonA(const FInputActionValue& Value);
+	void OnInputButtonAPressed(const FInputActionValue& Value);
 
 private:
 	void MoveForward(float Value);

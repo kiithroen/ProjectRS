@@ -45,8 +45,6 @@ ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const F
 ARSMonster::ARSMonster(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<URSMonsterMovementComponent>(CharacterMovementComponentName))
 {
-	PrimaryActorTick.bCanEverTick = true;
-	
 	AIControllerClass = ARSAIMonsterController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
@@ -74,18 +72,10 @@ void ARSMonster::BeginPlay()
 
 void ARSMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	ClearBuryCorpseTimer();
 	ClearHitStopTimer();
 	
 	Super::EndPlay(EndPlayReason);
-}
-
-void ARSMonster::Tick(float DeltaTime)
-{
-	SCOPE_CYCLE_COUNTER(STAT_MonsterTick);
-	
-	Super::Tick(DeltaTime);
-
-	UpdateBuryCoprse(DeltaTime);
 }
 
 void ARSMonster::ApplyDamage(float Damage, AActor* Caster)
@@ -116,7 +106,6 @@ void ARSMonster::ApplyDie(AActor* Caster)
 {
 	Super::ApplyDie(Caster);
 
-	DeathLocation = GetActorLocation();
 	FTimerHandle TimerHandle;;
 	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
 	{
@@ -165,18 +154,18 @@ void ARSMonster::OnHitStopTimeout()
 
 void ARSMonster::StartBuryCoprse()
 {
-	bBuryCorpse = true;
 	SetLifeSpan(2.f);
+
+	ClearBuryCorpseTimer();
+	GetWorldTimerManager().SetTimer(BuryCorpseTimerHandle, this, &ARSMonster::OnUpdateBuryCoprse, 0.1f, true);
 }
 
-void ARSMonster::UpdateBuryCoprse(float DeltaTime)
+void ARSMonster::OnUpdateBuryCoprse()
 {
-	if (bBuryCorpse)
+	const float DeltaTime = GetWorldTimerManager().GetTimerRate(BuryCorpseTimerHandle);
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
-		if (USkeletalMeshComponent* MeshComp = GetMesh())
-		{
-			MeshComp->AddWorldOffset(-2.f * GetSimpleCollisionRadius() * DeltaTime * FVector::UpVector);
-		}
+		MeshComp->AddWorldOffset(-2.f * GetSimpleCollisionRadius() * DeltaTime * FVector::UpVector);
 	}
 }
 
@@ -186,5 +175,14 @@ void ARSMonster::ClearHitStopTimer()
 	{
 		GetWorldTimerManager().ClearTimer(HitStopTimerHandle);
 		HitStopTimerHandle.Invalidate();
+	}
+}
+
+void ARSMonster::ClearBuryCorpseTimer()
+{
+	if (BuryCorpseTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(BuryCorpseTimerHandle);
+		BuryCorpseTimerHandle.Invalidate();
 	}
 }

@@ -11,7 +11,7 @@ class ARSProjectile;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class PROJECTRS_API URSSkill_RangeAttack : public URSSkill
 {
 	GENERATED_BODY()
@@ -20,7 +20,7 @@ public:
 	URSSkill_RangeAttack();
 
 	virtual void OnBegin() override;
-	virtual void OnUpdate(float DeltaTime) override;
+	virtual void Do(float DeltaTime) override;
 
 protected:
 	UFUNCTION()

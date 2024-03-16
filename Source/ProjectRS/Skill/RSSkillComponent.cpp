@@ -202,7 +202,7 @@ void URSSkillComponent::StopSkill(const FGameplayTag& Id)
 	if (!Skill)
 		return;
 
-	Skill->Deactivate();
+	Skill->EndSkill();
 }
 
 void URSSkillComponent::SendEvent(const FGameplayTag& EventTag)

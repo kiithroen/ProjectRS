@@ -11,7 +11,7 @@ class ARSProjectile;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class PROJECTRS_API URSSkill_MeleeAttack : public URSSkill
 {
 	GENERATED_BODY()
@@ -20,7 +20,7 @@ public:
 	URSSkill_MeleeAttack();
 
 	virtual void OnBegin() override;
-	virtual void OnUpdate(float DeltaTime) override;
+	virtual void Do(float DeltaTime) override;
 	virtual void OnEnd() override;
 	virtual void OnEvent(const FGameplayTag& EventTag) override;
 
@@ -44,6 +44,8 @@ protected:
 	TArray<TObjectPtr<URSSkillEffect>> SkillEffectOnHit;
 
 private:
-	bool bTraceMeleeAttack = false;
+	UPROPERTY(Transient)
 	TArray<AActor*> ActorsToIgnore;
+	
+	bool bTraceMeleeAttack = false;
 };

@@ -36,49 +36,55 @@ void URSSkill_MeleeAttack::OnBegin()
 		{
 			OwnerAnim->PlayMontageWithEnd(Montage, [OwnerAnim, this](UAnimMontage*,bool)
 			{
-				Deactivate();
+				EndSkill();
 			});
+		}
+		else
+		{
+			EndSkill();
 		}
 	}
 }
 
-void URSSkill_MeleeAttack::OnUpdate(float DeltaTime)
+void URSSkill_MeleeAttack::Do(float DeltaTime)
 {
-	Super::OnUpdate(DeltaTime);
+	SCOPE_CYCLE_COUNTER(STAT_SkillMeleeAttackDo);
+	
+	Super::Do(DeltaTime);
 
-	if (bTraceMeleeAttack)
+	if (!bTraceMeleeAttack)
+		return;
+	
+	TArray<FHitResult> OutHitResults;
+	FRSTargetInfo_SocketTrace TargetInfo;
+	TargetInfo.StartSocket = StartSocket;
+	TargetInfo.EndSocket = EndSocket;
+	TargetInfo.Radius = Radius;
+	TargetInfo.TraceChannel = TraceChannel;
+
+	URSUtil::CollectTargets_SocketTrace(GetOwnerActor(), TargetInfo, ActorsToIgnore, OutHitResults);
+
+	if (OutHitResults.Num() > 0)
 	{
-		TArray<FHitResult> OutHitResults;
-		FRSTargetInfo_SocketTrace TargetInfo;
-		TargetInfo.StartSocket = StartSocket;
-		TargetInfo.EndSocket = EndSocket;
-		TargetInfo.Radius = Radius;
-		TargetInfo.TraceChannel = TraceChannel;
-
-		URSUtil::CollectTargets_SocketTrace(GetOwnerActor(), TargetInfo, ActorsToIgnore, OutHitResults);
-
-		if (OutHitResults.Num() > 0)
+		for (const auto& HitResult : OutHitResults)
 		{
-			for (const auto& HitResult : OutHitResults)
+			const AActor* HitActor = HitResult.GetActor();
+			if (!IsValid(HitActor))
+				continue;
+			
+			// 두번 맞지 않게
+			ActorsToIgnore.AddUnique(HitResult.GetActor());
+			
+			URSSkillComponent* SkillComp = HitActor->FindComponentByClass<URSSkillComponent>();
+			if (!SkillComp)
+				continue;
+
+			if (SkillComp->HasFlag(RSGT_Flag_Dead))
+				continue;
+
+			for (auto& SkillEffect : SkillEffectOnHit)
 			{
-				const AActor* HitActor = HitResult.GetActor();
-				if (!IsValid(HitActor))
-					continue;
-				
-				// 두번 맞지 않게
-				ActorsToIgnore.AddUnique(HitResult.GetActor());
-				
-				URSSkillComponent* SkillComp = HitActor->FindComponentByClass<URSSkillComponent>();
-				if (!SkillComp)
-					continue;
-
-				if (SkillComp->HasFlag(RSGT_Flag_Dead))
-					continue;
-
-				for (auto& SkillEffect : SkillEffectOnHit)
-				{
-					SkillComp->AddSkillEffect(SkillEffect, GetLevel(), GetOwnerActor(), nullptr, &HitResult);
-				}
+				SkillComp->AddSkillEffect(SkillEffect, GetLevel(), GetOwnerActor(), nullptr, &HitResult);
 			}
 		}
 	}

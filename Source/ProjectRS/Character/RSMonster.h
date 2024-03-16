@@ -22,7 +22,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void Tick(float DeltaTime) override;
 
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;
@@ -30,14 +29,16 @@ protected:
 	UFUNCTION()
 	void OnHitStopTimeout();
 	
+	UFUNCTION()
+	void OnUpdateBuryCoprse();
+	
 private:
 	void PlayHitStop();
 	void ClearHitStopTimer();
+	void ClearBuryCorpseTimer();
 
 	void StartBuryCoprse();
-	void UpdateBuryCoprse(float DeltaTime);
 	
 	FTimerHandle HitStopTimerHandle;
-	FVector DeathLocation;
-	bool bBuryCorpse = false;
+	FTimerHandle BuryCorpseTimerHandle;
 };

@@ -47,16 +47,23 @@ void URSMonsterMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReas
 
 void URSMonsterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SCOPE_CYCLE_COUNTER(STAT_MonsterMovementTick);
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void URSMonsterMovementComponent::PerformMovement(float DeltaTime)
 {
-	SCOPE_CYCLE_COUNTER(STAT_MonsterMovement);
+	if (bMovementByCurve)
+	{
+		PerformMovementByCurve(DeltaTime);
+		return;
+	}
 	
 	HandlePendingLaunch();
 	StartNewPhysics(DeltaTime, 0);
 	PhysicsRotation(DeltaTime);
+	
 	LastUpdateRequestedVelocity = bHasRequestedVelocity ? RequestedVelocity : FVector::ZeroVector;
 	bHasRequestedVelocity = false;
 	UpdateComponentVelocity();

@@ -33,10 +33,11 @@ public:
 	
 	virtual void Launch(const FVector& Velocity, AActor* Caster) = 0;
 	virtual void StopMovementAll() = 0;
-	virtual void StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale) = 0;
+	virtual float StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale) = 0;
 	virtual void StopMovementByCurve() = 0;
-	virtual void EnableMovementInput(bool bEnable) = 0;
 	virtual FVector GetLastMovementDirection() const = 0;
+	
+	virtual void EnableMovementInput(bool bEnable) = 0;
 	
 	virtual void EnableGhost(bool bEnable) = 0;
 

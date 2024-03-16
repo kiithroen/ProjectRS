@@ -5,25 +5,19 @@
 #include "CoreMinimal.h"
 #include "RSCharacterMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "RSMonsterMovementComponent.generated.h"
+#include "RSHeroMovementComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PROJECTRS_API URSMonsterMovementComponent : public URSCharacterMovementComponent
+class PROJECTRS_API URSHeroMovementComponent : public URSCharacterMovementComponent
 {
 	GENERATED_BODY()
 
 public:
-	URSMonsterMovementComponent();
+	URSHeroMovementComponent();
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-protected:
-	virtual void PerformMovement(float DeltaTime) override;
-	virtual void PhysNavWalking(float DeltaTime, int32 Iterations) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

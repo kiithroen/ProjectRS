@@ -24,4 +24,5 @@ class PROJECTRS_API IRSAnimInterface
 public:
 	virtual float PlayMontage(UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) = 0;
 	virtual float PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate = 1.f, FName StartSectionName = NAME_None) = 0;
+	virtual void StopMontage(UAnimMontage* AnimMontage) = 0;
 };

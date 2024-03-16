@@ -23,11 +23,11 @@ void URSSkill_RangeAttack::OnBegin()
 	RemainShotTime = 0.f;
 }
 
-void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
+void URSSkill_RangeAttack::Do(float DeltaTime)
 {
-	SCOPE_CYCLE_COUNTER(STAT_SkillRangeAttackTick);
+	SCOPE_CYCLE_COUNTER(STAT_SkillRangeAttackDo);
 	
-	Super::OnUpdate(DeltaTime);
+	Super::Do(DeltaTime);
 
 	RemainShotTime = FMath::Max(RemainShotTime - DeltaTime, 0.f);
 	if (RemainShotTime > 0)
@@ -156,7 +156,7 @@ void URSSkill_RangeAttack::OnUpdate(float DeltaTime)
 	RemainAmmoCount -= 1;
 	if (RemainAmmoCount <= 0)
 	{
-		Deactivate();
+		EndSkill();
 	}
 }
 

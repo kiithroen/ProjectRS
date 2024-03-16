@@ -26,7 +26,7 @@ UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Id_Null, "Skill.Id.Null");
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Type_Default, "Skill.Type.Default");
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Type_Sub, "Skill.Type.Sub");
 
-UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Event_Input_ButtonA, "Skill.Event.Input.ButtonA");
+UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Slot_Input_BttonA, "Skill.Slot.Input.ButtonA");
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Slot_MeleeAttack_1, "Skill.Slot.MeleeAttack.1");
 UE_DEFINE_GAMEPLAY_TAG(RSGT_Skill_Slot_RangeAttack_1, "Skill.Slot.RangeAttack.1");
 

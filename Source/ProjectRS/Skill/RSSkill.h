@@ -21,7 +21,7 @@ public:
 	virtual UWorld* GetWorld() const override;
 	
 	virtual bool CanActivate() const;
-	virtual void OnUpdate(float DeltaTime);
+	virtual void Do(float DeltaTime);
 	virtual void OnBegin();
 	virtual void OnEnd();
 	virtual void OnEquip();
@@ -60,7 +60,7 @@ public:
 
     bool IsAutoCast() const;
 	bool IsActive() const;
-	void Deactivate();
+	void EndSkill();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Skill", meta = (Categories = "Skill.Id"))

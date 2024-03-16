@@ -11,15 +11,16 @@
 #include "RSType.h"
 #include "Skill/RSSkill.h"
 #include "Character/RSCharacterPreset.h"
+#include "Component/RSCharacterMovementComponent.h"
 #include "Component/RSMonsterMovementComponent.h"
 #include "Component/RSHitBoxComponent.h"
 #include "Data/RSSkillItem.h"
 #include "GameFramework/RSAssetManager.h"
 
 ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<URSCharacterMovementComponent>(CharacterMovementComponentName))
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -105,23 +106,10 @@ void ARSCharacter::Init(URSCharacterPreset* InPreset)
 	}
 }
 
-void ARSCharacter::Tick(float DeltaTime)
-{
-	SCOPE_CYCLE_COUNTER(STAT_CharacterTick);
-	
-	Super::Tick(DeltaTime);
-	
-	LastMovementDirection = GetActorForwardVector();
-	
-	UpdateMovementByCurve(DeltaTime);
-}
-
 void ARSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	LastMovementDirection = GetActorForwardVector();
-
 	StatComponent->OnStatValueChanged.AddUObject(this, &ARSCharacter::OnStatValueChanged);
 }
 
@@ -229,35 +217,38 @@ void ARSCharacter::Launch(const FVector& Velocity, AActor* Caster)
 
 void ARSCharacter::StopMovementAll()
 {
-	StopMovementByCurve();
-	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	if (URSCharacterMovementComponent* MovementComp = Cast<URSCharacterMovementComponent>(GetCharacterMovement()))
 	{
-		MovementComp->StopMovementImmediately();
+		MovementComp->StopMovementAll();
 	}
 }
 
-void ARSCharacter::StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale)
+float ARSCharacter::StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale)
 {
-	if (!Curve)
+	if (URSCharacterMovementComponent* MovementComp = Cast<URSCharacterMovementComponent>(GetCharacterMovement()))
 	{
-		ensure(false);
-		return;
+		return MovementComp->StartMovementByCurve(Curve, Direction, Scale);
 	}
-
-	bMovementByCurve = true;
-	MovementByCurveElapsedTime = 0.f;
-	MovementCurve = Curve;
-	MovementCurveDirection = Direction;
-	MovementCurveScale = Scale;
+	
+	return 0.f;
 }
 
 void ARSCharacter::StopMovementByCurve()
 {
-	bMovementByCurve = false;
-	MovementByCurveElapsedTime = 0.f;
-	MovementCurve = nullptr;
-	MovementCurveDirection = FVector::ForwardVector;
-	MovementCurveScale = FVector::ZeroVector;
+	if (URSCharacterMovementComponent* MovementComp = Cast<URSCharacterMovementComponent>(GetCharacterMovement()))
+	{
+		MovementComp->StopMovementByCurve();
+	}
+}
+
+FVector ARSCharacter::GetLastMovementDirection() const
+{
+	if (URSCharacterMovementComponent* MovementComp = Cast<URSCharacterMovementComponent>(GetCharacterMovement()))
+	{
+		return MovementComp->GetLastMovementDirection();
+	}
+
+	return FVector::ZeroVector;
 }
 
 void ARSCharacter::EnableMovementInput(bool bEnable)
@@ -267,11 +258,6 @@ void ARSCharacter::EnableMovementInput(bool bEnable)
 		return;
 
 	MyController->SetIgnoreMoveInput(!bEnable);
-}
-
-FVector ARSCharacter::GetLastMovementDirection() const
-{
-	return LastMovementDirection;
 }
 
 void ARSCharacter::EnableGhost(bool bEnable)
@@ -363,8 +349,8 @@ float ARSCharacter::PlayMontage(UAnimMontage* AnimMontage, float InPlayRate, FNa
 
 float ARSCharacter::PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate, FName StartSectionName)
 {
-	UAnimInstance * AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
-	if( AnimMontage && AnimInstance )
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
+	if (AnimMontage && AnimInstance)
 	{
 		float const Duration = AnimInstance->Montage_Play(AnimMontage, InPlayRate);
 
@@ -382,7 +368,19 @@ float ARSCharacter::PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void
 		}
 	}	
 
+	EndCallback(AnimMontage, false);
+	
 	return 0.f;
+}
+
+void ARSCharacter::StopMontage(UAnimMontage* AnimMontage)
+{
+	UAnimInstance* AnimInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	const UAnimMontage* MontageToStop = AnimMontage ? AnimMontage : GetCurrentMontage();
+	if (AnimInstance && MontageToStop && !AnimInstance->Montage_GetIsStopped(MontageToStop))
+	{
+		AnimInstance->Montage_Stop(MontageToStop->BlendOut.GetBlendTime(), MontageToStop);
+	}
 }
 
 const FGameplayTag& ARSCharacter::GetId() const
@@ -433,30 +431,4 @@ void ARSCharacter::OnStatValueChanged(URSStatComponent* StatComp, const FGamepla
 			MovementComp->MaxWalkSpeed = NewValue;
 		}
 	}
-}
-
-void ARSCharacter::UpdateMovementByCurve(float DeltaTime)
-{
-	if (!bMovementByCurve)
-		return;
-
-	if (!MovementCurve)
-		return;
-
-	MovementByCurveElapsedTime += DeltaTime;
-
-	float MinTime = 0.f;
-	float MaxTime = 0.f;
-	MovementCurve->GetTimeRange(MinTime, MaxTime);
-
-	if (MovementByCurveElapsedTime >= MaxTime)
-	{
-		StopMovementByCurve();
-		return;
-	}
-
-	const FVector Velocity = MovementCurve->GetVectorValue(MovementByCurveElapsedTime) * MovementCurveScale;
-	const FTransform ToDirection(MovementCurveDirection.Rotation(), GetActorLocation());
-	const FVector DeltaLocation = ToDirection.TransformPosition(Velocity * DeltaTime);
-	SetActorLocation(DeltaLocation, true);
 }

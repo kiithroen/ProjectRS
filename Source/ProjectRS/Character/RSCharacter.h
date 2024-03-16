@@ -30,7 +30,6 @@ class PROJECTRS_API ARSCharacter : public ACharacter, public IRSCombatInterface,
 public:
 	ARSCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
@@ -43,11 +42,12 @@ public:
 	virtual void Launch(const FVector& Velocity, AActor* Caster) override;
 	
 	virtual void StopMovementAll() override;
-	virtual void StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale) override;
+	virtual float StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale) override;
 	virtual void StopMovementByCurve() override;
-	virtual void EnableMovementInput(bool bEnable) override;
 	virtual FVector GetLastMovementDirection() const override;
 
+	virtual void EnableMovementInput(bool bEnable) override;
+	
 	virtual void EnableGhost(bool bEnable) override;
 
 	virtual float GetStat(const FGameplayTag& Tag) const override;
@@ -58,7 +58,8 @@ public:
 	
 	virtual float PlayMontage(UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
 	virtual float PlayMontageWithEnd(UAnimMontage* AnimMontage, TFunction<void(UAnimMontage*,bool)> EndCallback, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
-	
+	virtual void StopMontage(UAnimMontage* AnimMontage) override;
+
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsDead"))
 	bool K2_IsDead() const { return IsDead(); }
 	
@@ -74,7 +75,6 @@ protected:
 	UFUNCTION()
 	void OnStatValueChanged(URSStatComponent* StatComp, const FGameplayTag& Tag, float OldValue, float NewValue);
 
-	void UpdateMovementByCurve(float DeltaTime);
 
 public:
 	FRSOnHeal OnHeal;
@@ -90,27 +90,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "RS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSStatComponent> StatComponent;
 	
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	bool bMovementByCurve = false;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	float MovementByCurveElapsedTime = 0.f;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector MovementCurveScale = FVector::OneVector;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector MovementCurveDirection = FVector::ForwardVector;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TObjectPtr<UCurveVector> MovementCurve;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector LastMovementDirection;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FTimerHandle DamagedTimerHandle;
-
+protected:
 	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	TWeakObjectPtr<URSCharacterPreset> Preset;
 };
