@@ -82,6 +82,8 @@ class PROJECTRS_API URSAggregatingTickSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
+	static URSAggregatingTickSubsystem* Get(const UWorld* World);
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	

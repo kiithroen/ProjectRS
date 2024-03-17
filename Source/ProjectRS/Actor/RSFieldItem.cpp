@@ -27,12 +27,8 @@ ARSFieldItem::ARSFieldItem()
 void ARSFieldItem::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
 	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryActorTick.UnRegisterTickFunction();
 		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
@@ -73,11 +69,7 @@ void ARSFieldItem::Tick(float DeltaTime)
 
 void ARSFieldItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterActor(this);
 	}

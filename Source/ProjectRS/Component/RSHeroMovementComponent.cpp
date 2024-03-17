@@ -14,11 +14,7 @@ void URSHeroMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryComponentTick.UnRegisterTickFunction();
 		AggregatingTickSubsystem->RegisterComponent(this, TG_PostPhysics);
@@ -34,11 +30,7 @@ void URSHeroMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void URSHeroMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterComponent(this);
 	}

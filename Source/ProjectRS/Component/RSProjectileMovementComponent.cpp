@@ -15,11 +15,7 @@ void URSProjectileMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
     {
     	PrimaryComponentTick.UnRegisterTickFunction();
     	AggregatingTickSubsystem->RegisterComponent(this, TG_PrePhysics);
@@ -28,11 +24,7 @@ void URSProjectileMovementComponent::BeginPlay()
 
 void URSProjectileMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	const UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = World->GetSubsystem<URSAggregatingTickSubsystem>())
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterComponent(this);
 	}

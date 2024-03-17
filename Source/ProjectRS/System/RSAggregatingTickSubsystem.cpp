@@ -48,6 +48,14 @@ void FRSComponentCollectionTickFunction::ExecuteTick(float DeltaTime, ELevelTick
 	}
 }
 
+URSAggregatingTickSubsystem* URSAggregatingTickSubsystem::Get(const UWorld* World)
+{
+	if (!World)
+		return nullptr;
+
+	return World->GetSubsystem<URSAggregatingTickSubsystem>();
+}
+
 void URSAggregatingTickSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	check(!bInitialized);
