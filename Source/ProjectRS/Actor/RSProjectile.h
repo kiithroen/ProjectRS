@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/RSActorPoolInterface.h"
 #include "RSProjectile.generated.h"
 
 class URSProjectileMovementComponent;
@@ -14,7 +15,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileHit, ARSProjectile*, const T
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileExplosion, ARSProjectile*, int32);
 
 UCLASS(Abstract)
-class PROJECTRS_API ARSProjectile : public AActor
+class PROJECTRS_API ARSProjectile : public AActor, public IRSActorPoolInterface
 {
 	GENERATED_BODY()
 	
@@ -25,6 +26,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void BeginPlayFromPool() override;
+	virtual void EndPlayFromPool() override;
+	
 	void SetCaster(AActor* Caster);
 	AActor* GetCaster() const;
 	void AddIgnoreActor(AActor* Actor);
@@ -54,27 +58,13 @@ public:
 	FRSOnProjectileExplosion OnProjectileExplosion;
 
 private:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TObjectPtr<AActor> Caster;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TObjectPtr<UObject> Trigger;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TArray<TObjectPtr<AActor>> ActorsToIgnore;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	TEnumAsByte<ETraceTypeQuery> TraceChannel;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
+	TArray<AActor*> ActorsToIgnore;
+	
+	TWeakObjectPtr<AActor> Caster;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 	int32 HitCount = 0;
-	
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	int32 ExplosionHitCount = 0;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector PrevLocation;
-	
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	FVector PrevLocation = FVector::ZeroVector;
 	FTimerHandle ExplosionTimerHandle;
 };

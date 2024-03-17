@@ -31,7 +31,6 @@ public:
 	FRSOnStatValueChanged OnStatValueChanged;
 
 private:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	TMap<FGameplayTag, float> StatValues;
 
 };

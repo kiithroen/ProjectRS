@@ -34,7 +34,7 @@ protected:
 	float Radius = 50.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Skill|MeleeAttack")
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Skill|MeleeAttack")
 	TSoftObjectPtr<UAnimMontage> MontageToPlay;
@@ -44,7 +44,7 @@ protected:
 
 private:
 	UPROPERTY(Transient)
-	TArray<TObjectPtr<AActor>> ActorsToIgnore;
+	TArray<AActor*> ActorsToIgnore;
 	
 	bool bTraceMeleeAttack = false;
 };

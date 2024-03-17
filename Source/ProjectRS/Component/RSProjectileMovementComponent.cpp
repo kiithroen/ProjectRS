@@ -14,22 +14,28 @@ URSProjectileMovementComponent::URSProjectileMovementComponent()
 void URSProjectileMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
-    {
-    	PrimaryComponentTick.UnRegisterTickFunction();
-    	AggregatingTickSubsystem->RegisterComponent(this, TG_PrePhysics);
-    }
 }
 
 void URSProjectileMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
+void URSProjectileMovementComponent::BeginPlayFromPool()
+{
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
+	{
+		PrimaryComponentTick.UnRegisterTickFunction();
+		AggregatingTickSubsystem->RegisterComponent(this, TG_PrePhysics);
+	}
+}
+
+void URSProjectileMovementComponent::EndPlayFromPool()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterComponent(this);
 	}
-	
-	Super::EndPlay(EndPlayReason);
 }
 
 void URSProjectileMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

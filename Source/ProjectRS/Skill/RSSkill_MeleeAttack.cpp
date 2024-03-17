@@ -61,7 +61,10 @@ void URSSkill_MeleeAttack::Do(float DeltaTime)
 	TargetInfo.EndSocket = EndSocket;
 	TargetInfo.Radius = Radius;
 	TargetInfo.TraceChannel = TraceChannel;
-
+	ActorsToIgnore.RemoveAll([](const AActor* Actor)
+	{
+		return !IsValid(Actor);
+	});
 	URSUtil::CollectTargets_SocketTrace(GetOwnerActor(), TargetInfo, ActorsToIgnore, OutHitResults);
 
 	if (OutHitResults.Num() > 0)

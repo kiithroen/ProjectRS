@@ -9,11 +9,12 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "System/RSActorPoolSubsystem.h"
 #include "System/RSAggregatingTickSubsystem.h"
 
 ARSProjectile::ARSProjectile()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	if (SphereComponent)
@@ -53,14 +54,6 @@ ARSProjectile::ARSProjectile()
 void ARSProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
-	{
-		PrimaryActorTick.UnRegisterTickFunction();
-		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
-	}
-	
-	PrevLocation = GetActorLocation();
 }
 
 void ARSProjectile::Tick(float DeltaTime)
@@ -72,16 +65,17 @@ void ARSProjectile::Tick(float DeltaTime)
 	if (!SphereComponent)
 		return;
 
-	UWorld* World = GetWorld();
-	if (!World)
-		return;
-	
 	TArray<FHitResult> OutHitResults;
 	FRSTargetInfo_SphereArea TargetInfo;
 	TargetInfo.StartLocation = PrevLocation;
 	TargetInfo.EndLocation = GetActorLocation();
 	TargetInfo.Radius = SphereComponent->GetScaledSphereRadius();
 	TargetInfo.TraceChannel = TraceChannel;
+	
+	ActorsToIgnore.RemoveAll([](const AActor* Actor)
+	{
+		return !IsValid(Actor);
+	});
 	URSUtil::CollectTargets_SphereArea(this, TargetInfo, ActorsToIgnore, OutHitResults);
 	
 	if (OutHitResults.Num() > 0)
@@ -110,6 +104,28 @@ void ARSProjectile::Tick(float DeltaTime)
 
 void ARSProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	Super::EndPlay(EndPlayReason);
+}
+
+void ARSProjectile::BeginPlayFromPool()
+{
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
+	{
+		PrimaryActorTick.UnRegisterTickFunction();
+		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
+	}
+	
+	Caster.Reset();
+	ActorsToIgnore.Reset();
+	TraceChannel = TraceTypeQuery1;
+	HitCount = 0;
+	ExplosionHitCount = 0;
+	PrevLocation = GetActorLocation();
+	ClearExplosionTimer();
+}
+
+void ARSProjectile::EndPlayFromPool()
+{
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterActor(this);
@@ -119,8 +135,6 @@ void ARSProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	OnProjectileHit.Clear();
 	OnProjectileExplosion.Clear();
-	
-	Super::EndPlay(EndPlayReason);
 }
 
 void ARSProjectile::SetCaster(AActor* InCaster)
@@ -202,7 +216,10 @@ void ARSProjectile::OnExplosion()
 
 	OnProjectileExplosion.Broadcast(this, HitCount);
 
-	Destroy();
+	if (URSActorPoolSubsystem* ActorPoolSubsystem = URSActorPoolSubsystem::Get(GetWorld()))
+	{
+		ActorPoolSubsystem->Despawn(this);
+	}
 }
 
 void ARSProjectile::ClearExplosionTimer()

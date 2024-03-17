@@ -91,6 +91,5 @@ public:
 	TObjectPtr<URSStatComponent> StatComponent;
 	
 protected:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	TWeakObjectPtr<URSCharacterPreset> Preset;
 };

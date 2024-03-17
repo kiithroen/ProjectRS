@@ -9,7 +9,7 @@
 
 URSSkillComponent::URSSkillComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void URSSkillComponent::BeginPlay()

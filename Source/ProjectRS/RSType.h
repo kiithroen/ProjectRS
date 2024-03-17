@@ -149,7 +149,7 @@ struct PROJECTRS_API FRSTargetInfo_SocketTrace
 	float Radius = 30.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 
 USTRUCT(BlueprintType)
@@ -170,7 +170,7 @@ struct PROJECTRS_API FRSTargetInfo_BoxTrace
 	FVector HalfSize = FVector(100.f, 100.f, 100.f);;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 
 USTRUCT(BlueprintType)
@@ -188,7 +188,7 @@ struct PROJECTRS_API FRSTargetInfo_BoxArea
 	FVector HalfSize = FVector(100.f, 100.f, 100.f);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 
 USTRUCT(BlueprintType)
@@ -206,7 +206,7 @@ struct PROJECTRS_API FRSTargetInfo_SphereArea
 	float Radius = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 
 
@@ -225,7 +225,7 @@ struct PROJECTRS_API FRSTargetInfo_CylinderArea
 	float Radius = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 
 USTRUCT(BlueprintType)
@@ -243,6 +243,6 @@ struct PROJECTRS_API FRSTargetInfo_CapsuleArea
 	float Radius = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 };
 

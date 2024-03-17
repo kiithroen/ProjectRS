@@ -7,7 +7,7 @@
 
 URSCharacterMovementComponent::URSCharacterMovementComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void URSCharacterMovementComponent::BeginPlay()

@@ -37,9 +37,8 @@ private:
 	bool IsSpawnableLocation(const FVector& SpawnLocation) const;
 
 private:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TArray<TObjectPtr<ARSMonster>> SpawnedMonster;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	FTimerHandle SpawnTimerHandle;
 };

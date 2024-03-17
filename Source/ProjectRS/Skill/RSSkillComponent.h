@@ -74,18 +74,16 @@ public:
 	FRSOnFlagRemoved OnFlagRemoved;
 
 private:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TArray<TObjectPtr<URSSkill>> Skills;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TArray<TObjectPtr<URSSkillEffect>> ActiveSkillEffects;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TArray<TObjectPtr<URSSkillEffect>> PendingSkillEffects;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TArray<TObjectPtr<URSSkillEffect>> ExpiredSkillEffects;
-	
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
 	FGameplayTagContainer Flags;
 };

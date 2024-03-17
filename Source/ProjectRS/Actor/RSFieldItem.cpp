@@ -11,7 +11,7 @@
 
 ARSFieldItem::ARSFieldItem()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	if (MeshComponent)

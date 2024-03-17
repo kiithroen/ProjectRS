@@ -39,7 +39,7 @@ protected:
 	float AttackRange = 1000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Skill|RangeAttack")
-	TEnumAsByte<ETraceTypeQuery> TraceChannel = ETraceTypeQuery::TraceTypeQuery1;
+	TEnumAsByte<ETraceTypeQuery> TraceChannel = TraceTypeQuery1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Skill|RangeAttack")
 	TSubclassOf<ARSProjectile> ProjectileClass;

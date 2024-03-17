@@ -24,7 +24,7 @@ void URSObjectPoolSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(!bInitialized);
 	bInitialized = true;
 
-	CreatePool<URSSkillEffect_Damage>(8, 64, 4);
+	InitPool<URSSkillEffect_Damage>(8, 64, 4);
 }
 
 void URSObjectPoolSubsystem::Deinitialize()

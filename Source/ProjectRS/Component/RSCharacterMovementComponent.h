@@ -32,21 +32,12 @@ protected:
 	void UpdateLastMovementDirection();
 
 protected:
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	bool bMovementByCurve = false;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	float MovementByCurveElapsedTime = 0.f;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector MovementCurveScale = FVector::OneVector;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector MovementCurveDirection = FVector::ForwardVector;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
+	UPROPERTY(Transient)
 	TObjectPtr<UCurveVector> MovementCurve;
-
-	UPROPERTY(Transient, VisibleAnywhere, Category = "RS")
-	FVector LastMovementDirection;
+	
+	bool bMovementByCurve = false;
+	float MovementByCurveElapsedTime = 0.f;
+	FVector MovementCurveScale = FVector::OneVector;
+	FVector MovementCurveDirection = FVector::ForwardVector;
+	FVector LastMovementDirection = FVector::ZeroVector;
 };

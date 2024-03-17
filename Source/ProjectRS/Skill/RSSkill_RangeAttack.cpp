@@ -10,6 +10,7 @@
 #include "Algo/RandomShuffle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "System/RSActorPoolSubsystem.h"
 
 URSSkill_RangeAttack::URSSkill_RangeAttack()
 {
@@ -37,6 +38,10 @@ void URSSkill_RangeAttack::Do(float DeltaTime)
 	if (!World)
 		return;
 
+	URSActorPoolSubsystem* ActorPoolSubsystem = URSActorPoolSubsystem::Get(World);
+	if (!ActorPoolSubsystem)
+		return;
+	
 	AActor* OwnerActor = GetOwnerActor();
 	if (!IsValid(OwnerActor))
 		return;
@@ -115,11 +120,9 @@ void URSSkill_RangeAttack::Do(float DeltaTime)
 	for (int32 Index = 0; Index < ProjectileSpawnCount; ++Index)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ProjectileSpawn);
-		
-		ARSProjectile* Projectile = URSUtil::SpawnActor<ARSProjectile>(World, ProjectileClass, SpawnLocation, SpawnRotation);
-		if (!IsValid(Projectile))
-			continue;
 
+			
+		ARSProjectile* Projectile = Cast<ARSProjectile>(ActorPoolSubsystem->Spawn(ProjectileClass, SpawnLocation, SpawnRotation));
 		Projectile->SetCaster(OwnerActor);
 		Projectile->AddIgnoreActor(OwnerActor);
 		Projectile->SetTraceChannel(TraceChannel);

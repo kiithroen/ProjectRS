@@ -8,13 +8,13 @@
 #include "RSObjectPoolSubsystem.generated.h"
 
 UCLASS()
-class PROJECTRS_API URSInstancedObjectPool : public UObject
+class PROJECTRS_API URSAllocatedObjectPool : public UObject
 {
 	GENERATED_BODY()
 
 public:
 	template <typename T>
-	void CreatePool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void InitPool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		ensure(InInitSize <= InMaxSize);
 		ensure(InInitSize > 0);
@@ -61,7 +61,7 @@ public:
 				{
 					Alloc<T>();
 				}
-				UE_LOG(LogRS, Display, TEXT("%s Pool Grow: %d"), *T::StaticClass()->GetName(), CurGrowSize);
+				UE_LOG(LogRS, Display, TEXT("%s Pool Grow: %d, AllocSize: %d"), *T::StaticClass()->GetName(), CurGrowSize, AllocSize);
 			}
 		}
 		
@@ -75,10 +75,8 @@ public:
 				ensure(Object->GetClass() == T::StaticClass());
 				return Object;
 			}
-			else
-			{
-				ensure(false);
-			}
+			
+			ensure(false);
 		}
 
 		UE_LOG(LogRS, Warning, TEXT("%s Pool Exceed: Max(%d)"), *T::StaticClass()->GetName(), MaxSize);
@@ -108,9 +106,15 @@ private:
 	template <typename T>
 	void Alloc()
 	{
-		T* SkillEffect = NewObject<T>();
-		PoolArray.Push(SkillEffect);
-		++AllocSize;
+		if (UObject* Object = NewObject<T>())
+		{
+			PoolArray.Push(Object);
+			++AllocSize;
+		}
+		else
+		{
+			ensure(false);
+		}
 	}
 
 	UPROPERTY(Transient)
@@ -142,7 +146,7 @@ public:
 	void SetDefaultSize(int32 InitSize, int32 MaxSize, int32 GrowSize);
 
 	template <typename T>
-	void CreatePool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void InitPool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		UClass* ObjectClass = T::StaticClass();
 		if (!ObjectClass)
@@ -151,12 +155,12 @@ public:
 			return;
 		}
 		
-		if (!InstancedObjectPoolMap.Contains(ObjectClass))
+		if (!AllocatedObjectPoolMap.Contains(ObjectClass))
 		{
-			InstancedObjectPoolMap.Add(ObjectClass, NewObject<URSInstancedObjectPool>());
+			AllocatedObjectPoolMap.Add(ObjectClass, NewObject<URSAllocatedObjectPool>());
 		}
 		
-		InstancedObjectPoolMap[ObjectClass]->CreatePool<T>(InInitSize, InMaxSize, InGrowSize);
+		AllocatedObjectPoolMap[ObjectClass]->InitPool<T>(InInitSize, InMaxSize, InGrowSize);
 	}
 	
 	template <typename T>
@@ -169,13 +173,13 @@ public:
 			return;
 		}
 		
-		if (!InstancedObjectPoolMap.Contains(ObjectClass))
+		if (!AllocatedObjectPoolMap.Contains(ObjectClass))
 		{
 			ensure(false);
 			return;
 		}
 		
-		InstancedObjectPoolMap[ObjectClass]->Reset();
+		AllocatedObjectPoolMap[ObjectClass]->Reset();
 	}
 
 	template <typename T>
@@ -188,12 +192,12 @@ public:
 			return nullptr;
 		}
 		
-		if (!InstancedObjectPoolMap.Contains(ObjectClass))
+		if (!AllocatedObjectPoolMap.Contains(ObjectClass))
 		{
-			CreatePool<T>(DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
+			InitPool<T>(DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
 		}
 		
-		return InstancedObjectPoolMap[ObjectClass]->Pop<T>();
+		return AllocatedObjectPoolMap[ObjectClass]->Pop<T>();
 	}
 
 	template <typename T>
@@ -206,18 +210,18 @@ public:
 			return;
 		}
 		
-		if (!InstancedObjectPoolMap.Contains(ObjectClass))
+		if (!AllocatedObjectPoolMap.Contains(ObjectClass))
 		{
 			ensure(false);
 			return;
 		}
 		
-		InstancedObjectPoolMap[ObjectClass]->Push<T>(Object);
+		AllocatedObjectPoolMap[ObjectClass]->Push<T>(Object);
 	}
 	
 private:
 	UPROPERTY(Transient)
-	TMap<UClass*, TObjectPtr<URSInstancedObjectPool>> InstancedObjectPoolMap;
+	TMap<UClass*, TObjectPtr<URSAllocatedObjectPool>> AllocatedObjectPoolMap;
 
 	int32 DefaultInitSize = 8;
 	int32 DefaultMaxSize = 32;
