@@ -29,7 +29,7 @@ void URSObjectPoolSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void URSObjectPoolSubsystem::Deinitialize()
 {
-	Reset<URSSkillEffect_Damage>();
+	ResetPool<URSSkillEffect_Damage>();
 	
 	check(bInitialized);
 	bInitialized = false;

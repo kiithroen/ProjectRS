@@ -19,6 +19,9 @@ public:
 	
 	ARSHero(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
+	
 protected:
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;

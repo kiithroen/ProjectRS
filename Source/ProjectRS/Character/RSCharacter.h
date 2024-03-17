@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Character.h"
+#include "Interface/RSSpawnInterface.h"
 #include "Interface/RSAnimInterface.h"
 #include "Interface/RSCombatInterface.h"
 #include "RSCharacter.generated.h"
@@ -23,15 +24,15 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnDie, ARSCharacter*, AActor*);
  * 
  */
 UCLASS(Abstract)
-class PROJECTRS_API ARSCharacter : public ACharacter, public IRSCombatInterface, public IRSAnimInterface
+class PROJECTRS_API ARSCharacter : public ACharacter, public IRSSpawnInterface, public IRSCombatInterface, public IRSAnimInterface
 {
 	GENERATED_BODY()
 	
 public:
 	ARSCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 	
 	virtual bool IsDead() const override;
 	virtual bool IsImmune() const override;
@@ -74,8 +75,8 @@ public:
 protected:
 	UFUNCTION()
 	void OnStatValueChanged(URSStatComponent* StatComp, const FGameplayTag& Tag, float OldValue, float NewValue);
-
-
+	
+	
 public:
 	FRSOnHeal OnHeal;
 	FRSOnDamaged OnDamaged;

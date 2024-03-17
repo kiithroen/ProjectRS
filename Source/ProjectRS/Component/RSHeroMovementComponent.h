@@ -14,9 +14,10 @@ class PROJECTRS_API URSHeroMovementComponent : public URSCharacterMovementCompon
 
 public:
 	URSHeroMovementComponent();
-
+	
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
+	
 protected:
-	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

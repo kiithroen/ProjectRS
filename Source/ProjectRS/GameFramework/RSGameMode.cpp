@@ -4,6 +4,7 @@
 #include "GameFramework/RSGameMode.h"
 
 #include "RSAssetManager.h"
+#include "Character/RSCharacterPreset.h"
 #include "GameFramework/RSPlayerController.h"
 #include "Character/RSHero.h"
 #include "Character/RSMonster.h"
@@ -11,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Skill/RSSkillComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/RSActorSpawnSubsystem.h"
 
 ARSGameMode::ARSGameMode()
 {
@@ -33,6 +35,13 @@ void ARSGameMode::StartPlay()
 		return;
 	}
 
+	URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(GetWorld());
+	if (!ActorSpawnSubsystem)
+	{
+		ensure(false);
+		return;
+	}
+	
 	const URSGlobalData* GlobalData = URSAssetManager::Get().GetOrLoadGlobalData();
 	if (!GlobalData)
 		return;
@@ -42,6 +51,15 @@ void ARSGameMode::StartPlay()
 		ensure(false);
 		return;
 	}
+
+	if (!GlobalData->DefaultMonster)
+	{
+		ensure(false);
+		return;
+	}
+
+	ActorSpawnSubsystem->InitPool(GlobalData->DefaultMonster->CharacterClass.LoadSynchronous(),
+		GlobalData->InitialMonsterNum, GlobalData->MaxMonsterNum, 32);
 	
 	const FVector StartLocation = PlayerStart->GetActorLocation();
 	ARSHero* Hero = ARSHero::Spawn(GetWorld(), GlobalData->DefaultHero, StartLocation, FRotator::ZeroRotator);
@@ -49,7 +67,7 @@ void ARSGameMode::StartPlay()
 		return;
 
 	PlayerController->Possess(Hero);
-
+	
 	for (int32 Index = 0; Index < GlobalData->InitialMonsterNum; ++Index)
 	{
 		SpawnMonster();
@@ -98,7 +116,7 @@ void ARSGameMode::OnSpawnTimer()
 	if (!GlobalData)
 		return;
 	
-	if (SpawnedMonster.Num() >= GlobalData->MaxMonsterNum)
+	if (FieldMonster.Num() >= GlobalData->MaxMonsterNum)
 		return;
 
 	SpawnMonster();
@@ -106,9 +124,13 @@ void ARSGameMode::OnSpawnTimer()
 
 void ARSGameMode::UpdateMonster()
 {
-	SpawnedMonster.RemoveAllSwap([](const ARSMonster* Monster) {
-		return !IsValid(Monster);
-		});
+	FieldMonster.RemoveAllSwap([](const ARSMonster* Monster)
+	{
+		if (!IsValid(Monster))
+			return true;
+
+		return Monster->IsDead();
+	});
 
 	TeleportMonster();
 }
@@ -121,7 +143,6 @@ void ARSGameMode::SpawnMonster()
 
 	if (!GlobalData->DefaultMonster)
 		return;
-
 	
 	FVector SpawnLocation;
 	if (!FindRandomSpawnLocation(SpawnLocation))
@@ -131,7 +152,7 @@ void ARSGameMode::SpawnMonster()
 	if (!IsValid(Monster))
 		return;
 
-	SpawnedMonster.Emplace(Monster);
+	FieldMonster.Emplace(Monster);
 }
 
 void ARSGameMode::TeleportMonster()
@@ -145,14 +166,15 @@ void ARSGameMode::TeleportMonster()
 		return;
 	
 	const FVector HeroLocation = Hero->GetActorLocation();
-	for (const auto& Monster : SpawnedMonster)
+	for (const auto& Monster : FieldMonster)
 	{
 		const FVector CurLocation = Monster->GetActorLocation();
 
+		constexpr float KillZ = -1000.f;
 		const float DiffX = FMath::Abs(HeroLocation.X - CurLocation.X);
 		const float DiffY = FMath::Abs(HeroLocation.Y - CurLocation.Y);
 
-		if (DiffX > GlobalData->MonsterTeleportRange || DiffY > GlobalData->MonsterTeleportRange)
+		if (CurLocation.Z < KillZ || DiffX > GlobalData->MonsterTeleportRange || DiffY > GlobalData->MonsterTeleportRange)
 		{
 			FVector TeleportLocation;
 			if (FindRandomSpawnLocation(TeleportLocation))

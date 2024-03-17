@@ -11,30 +11,31 @@
 
 URSMonsterMovementComponent::URSMonsterMovementComponent()
 {
+	PrimaryComponentTick.bCanEverTick = false;
+	
 	bProjectNavMeshWalking = true;
 	NavMeshProjectionInterval = 0.3f;
 }
 
-void URSMonsterMovementComponent::BeginPlay()
+void URSMonsterMovementComponent::OnSpawn()
 {
-	Super::BeginPlay();
+	Super::OnSpawn();
 	
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryComponentTick.UnRegisterTickFunction();
-		AggregatingTickSubsystem->RegisterComponent(this, TG_PostPhysics);
+		AggregatingTickSubsystem->RegisterComponent(this, TG_PrePhysics);
 	}
-	
 }
 
-void URSMonsterMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void URSMonsterMovementComponent::OnDespawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		AggregatingTickSubsystem->UnRegisterComponent(this);
 	}
-	
-	Super::EndPlay(EndPlayReason);
+
+	Super::OnDespawn();
 }
 
 void URSMonsterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

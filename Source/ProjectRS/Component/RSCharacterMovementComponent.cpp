@@ -10,9 +10,13 @@ URSCharacterMovementComponent::URSCharacterMovementComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void URSCharacterMovementComponent::BeginPlay()
+void URSCharacterMovementComponent::OnSpawn()
 {
-	Super::BeginPlay();
+}
+
+void URSCharacterMovementComponent::OnDespawn()
+{
+	StopMovementAll();
 }
 
 void URSCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

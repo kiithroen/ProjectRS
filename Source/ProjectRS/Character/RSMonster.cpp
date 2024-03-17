@@ -13,6 +13,7 @@
 #include "Data/RSGlobalData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "System/RSActorSpawnSubsystem.h"
 
 ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
@@ -31,14 +32,17 @@ ARSMonster* ARSMonster::Spawn(UWorld* World, URSCharacterPreset* Preset, const F
 		ensure(false);
 		return nullptr;
 	}
+
+	URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(World);
+	if (!ActorSpawnSubsystem)
+		return nullptr;
 	
-	ARSMonster* Monster = URSUtil::SpawnActor<ARSMonster>(World, CharacterClass, SpawnLocation, SpawnRotation);
+	ARSMonster* Monster = Cast<ARSMonster>(ActorSpawnSubsystem->Spawn(CharacterClass, SpawnLocation, SpawnRotation));
 	if (!IsValid(Monster))
 		return nullptr;
 
 	Monster->Init(Preset);
-	Monster->SpawnDefaultController();
-
+	
 	return Monster;
 }
 
@@ -65,17 +69,41 @@ ARSMonster::ARSMonster(const FObjectInitializer& ObjectInitializer)
 	}
 }
 
-void ARSMonster::BeginPlay()
+void ARSMonster::OnSpawn()
 {
-	Super::BeginPlay();
+	Super::OnSpawn();
+
+	EnableGhost(false);
+	
+	if (!IsValid(GetController()))
+	{
+		SpawnDefaultController();
+	}
+	
+	ARSAIMonsterController* MyController = Cast<ARSAIMonsterController>(GetController());
+	if (IsValid(MyController))
+	{
+		MyController->StartAI();
+	}
 }
 
-void ARSMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ARSMonster::OnDespawn()
 {
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		MeshComp->SetRelativeLocation(SavedMeshRelativeLocation);
+	}
+	
+	ARSAIMonsterController* MyController = Cast<ARSAIMonsterController>(GetController());
+	if (IsValid(MyController))
+	{
+		MyController->StopAI();
+	}
+	
 	ClearBuryCorpseTimer();
 	ClearHitStopTimer();
 	
-	Super::EndPlay(EndPlayReason);
+	Super::OnDespawn();
 }
 
 void ARSMonster::ApplyDamage(float Damage, AActor* Caster)
@@ -129,6 +157,14 @@ void ARSMonster::ApplyDie(AActor* Caster)
 	}
 }
 
+void ARSMonster::LifeSpanExpired()
+{
+	if (URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(GetWorld()))
+	{
+		ActorSpawnSubsystem->Despawn(this);
+	}
+}
+
 void ARSMonster::PlayHitStop()
 {
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
@@ -154,6 +190,11 @@ void ARSMonster::OnHitStopTimeout()
 
 void ARSMonster::StartBuryCorpse()
 {
+	if (const USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		SavedMeshRelativeLocation = MeshComp->GetRelativeLocation();
+	}
+	
 	SetLifeSpan(2.f);
 
 	ClearBuryCorpseTimer();

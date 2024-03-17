@@ -64,6 +64,22 @@ ARSCharacter::ARSCharacter(const FObjectInitializer& ObjectInitializer)
 	StatComponent = CreateDefaultSubobject<URSStatComponent>(TEXT("Stat"));
 }
 
+void ARSCharacter::OnSpawn()
+{
+	StatComponent->OnStatValueChanged.AddUObject(this, &ARSCharacter::OnStatValueChanged);
+}
+
+void ARSCharacter::OnDespawn()
+{
+	StatComponent->OnStatValueChanged.RemoveAll(this);
+
+	OnHeal.Clear();
+	OnDamaged.Clear();
+	OnDie.Clear();
+	
+	Preset.Reset();
+}
+
 void ARSCharacter::Init(URSCharacterPreset* InPreset)
 {
 	if (!InPreset)
@@ -101,24 +117,6 @@ void ARSCharacter::Init(URSCharacterPreset* InPreset)
 			SkillComponent->EquipSkill(Skill);
 		}
 	}
-}
-
-void ARSCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	StatComponent->OnStatValueChanged.AddUObject(this, &ARSCharacter::OnStatValueChanged);
-}
-
-void ARSCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	StatComponent->OnStatValueChanged.RemoveAll(this);
-
-	OnHeal.Clear();
-	OnDamaged.Clear();
-	OnDie.Clear();
-	
-	Super::EndPlay(EndPlayReason);
 }
 
 bool ARSCharacter::IsDead() const

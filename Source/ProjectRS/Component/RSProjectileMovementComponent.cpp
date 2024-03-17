@@ -11,17 +11,7 @@ URSProjectileMovementComponent::URSProjectileMovementComponent()
 {
 }
 
-void URSProjectileMovementComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void URSProjectileMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-}
-
-void URSProjectileMovementComponent::BeginPlayFromPool()
+void URSProjectileMovementComponent::OnSpawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
@@ -30,7 +20,7 @@ void URSProjectileMovementComponent::BeginPlayFromPool()
 	}
 }
 
-void URSProjectileMovementComponent::EndPlayFromPool()
+void URSProjectileMovementComponent::OnDespawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{

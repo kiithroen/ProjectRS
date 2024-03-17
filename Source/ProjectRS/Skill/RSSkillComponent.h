@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSSkillComponent.generated.h"
 
 class URSSkillComponent;
@@ -15,15 +16,15 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnFlagAdded, URSSkillComponent*, FGamepl
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnFlagRemoved, URSSkillComponent*, FGameplayTag);
 
 UCLASS()
-class PROJECTRS_API URSSkillComponent : public UActorComponent
+class PROJECTRS_API URSSkillComponent : public UActorComponent, public IRSSpawnInterface
 {
 	GENERATED_BODY()
 
 public:	
 	URSSkillComponent();
 
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Init();

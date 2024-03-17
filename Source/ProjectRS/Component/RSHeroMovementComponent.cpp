@@ -8,17 +8,28 @@
 
 URSHeroMovementComponent::URSHeroMovementComponent()
 {
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void URSHeroMovementComponent::BeginPlay()
+void URSHeroMovementComponent::OnSpawn()
 {
-	Super::BeginPlay();
+	Super::OnSpawn();
 	
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryComponentTick.UnRegisterTickFunction();
-		AggregatingTickSubsystem->RegisterComponent(this, TG_PostPhysics);
+		AggregatingTickSubsystem->RegisterComponent(this, TG_PrePhysics);
 	}
+}
+
+void URSHeroMovementComponent::OnDespawn()
+{
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
+	{
+		AggregatingTickSubsystem->UnRegisterComponent(this);
+	}
+
+	Super::OnDespawn();
 }
 
 void URSHeroMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -26,14 +37,4 @@ void URSHeroMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	SCOPE_CYCLE_COUNTER(STAT_HeroMovementTick);
 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void URSHeroMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
-	{
-		AggregatingTickSubsystem->UnRegisterComponent(this);
-	}
-	
-	Super::EndPlay(EndPlayReason);
 }

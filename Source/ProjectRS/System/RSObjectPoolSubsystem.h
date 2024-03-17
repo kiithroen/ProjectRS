@@ -14,7 +14,7 @@ class PROJECTRS_API URSAllocatedObjectPool : public UObject
 
 public:
 	template <typename T>
-	void InitPool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void Init(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		ensure(InInitSize <= InMaxSize);
 		ensure(InInitSize > 0);
@@ -65,22 +65,30 @@ public:
 			}
 		}
 		
+		T* Object;
 		if (PoolArray.Num() > 0)
 		{
-			++LiveObjectCount;
-			UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Object Count: %d"), *T::StaticClass()->GetName(), LiveObjectCount);
-			
-			if (T* Object = Cast<T>(PoolArray.Pop()))
-			{
-				ensure(Object->GetClass() == T::StaticClass());
-				return Object;
-			}
-			
-			ensure(false);
+			Object = Cast<T>(PoolArray.Pop());
+		}
+		else
+		{
+			UE_LOG(LogRS, Warning, TEXT("%s Pool Exceed: Max(%d)"), *T::StaticClass()->GetName(), MaxSize);
+			Object = NewObject<T>();
 		}
 
-		UE_LOG(LogRS, Warning, TEXT("%s Pool Exceed: Max(%d)"), *T::StaticClass()->GetName(), MaxSize);
-		return NewObject<T>();
+		if (!Object)
+		{
+			ensure(false);
+			return nullptr;
+		}
+
+		
+		ensure(Object->GetClass() == T::StaticClass());
+		
+		++LiveObjectCount;
+		UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Object Count: %d"), *T::StaticClass()->GetName(), LiveObjectCount);
+		
+		return Object;
 	}
 
 	template <typename T>
@@ -94,11 +102,16 @@ public:
 		
 		ensure(Object->GetClass() == T::StaticClass());
 
-		if (PoolArray.Num() < MaxSize)
+		--LiveObjectCount;
+		UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Object Count: %d"), *T::StaticClass()->GetName(), LiveObjectCount);
+			
+		if (LiveObjectCount < MaxSize)
 		{
-			--LiveObjectCount;
-			UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Object Count: %d"), *T::StaticClass()->GetName(), LiveObjectCount);
 			PoolArray.Push(Object);
+		}
+		else
+		{
+			Object->MarkAsGarbage();
 		}
 	}
 	
@@ -160,11 +173,11 @@ public:
 			AllocatedObjectPoolMap.Add(ObjectClass, NewObject<URSAllocatedObjectPool>());
 		}
 		
-		AllocatedObjectPoolMap[ObjectClass]->InitPool<T>(InInitSize, InMaxSize, InGrowSize);
+		AllocatedObjectPoolMap[ObjectClass]->Init<T>(InInitSize, InMaxSize, InGrowSize);
 	}
 	
 	template <typename T>
-	void Reset()
+	void ResetPool()
 	{
 		const UClass* ObjectClass = T::StaticClass();
 		if (!ObjectClass)

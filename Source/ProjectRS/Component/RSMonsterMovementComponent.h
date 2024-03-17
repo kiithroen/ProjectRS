@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RSCharacterMovementComponent.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSMonsterMovementComponent.generated.h"
 
 
@@ -15,9 +16,8 @@ class PROJECTRS_API URSMonsterMovementComponent : public URSCharacterMovementCom
 public:
 	URSMonsterMovementComponent();
 
-protected:
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -38,7 +38,7 @@ private:
 
 private:
 	UPROPERTY(Transient)
-	TArray<TObjectPtr<ARSMonster>> SpawnedMonster;
+	TArray<TObjectPtr<ARSMonster>> FieldMonster;
 
 	FTimerHandle SpawnTimerHandle;
 };

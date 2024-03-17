@@ -24,14 +24,20 @@ ARSFieldItem::ARSFieldItem()
 	}
 }
 
-void ARSFieldItem::BeginPlay()
+void ARSFieldItem::OnSpawn()
 {
-	Super::BeginPlay();
-	
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryActorTick.UnRegisterTickFunction();
 		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
+	}
+}
+
+void ARSFieldItem::OnDespawn()
+{
+	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
+	{
+		AggregatingTickSubsystem->UnRegisterActor(this);
 	}
 }
 
@@ -65,16 +71,6 @@ void ARSFieldItem::Tick(float DeltaTime)
 		const FVector MoveLocation = ItemLocation + (Direction.GetSafeNormal() * MoveDistance);
 		SetActorLocation(MoveLocation);
 	}
-}
-
-void ARSFieldItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
-	{
-		AggregatingTickSubsystem->UnRegisterActor(this);
-	}
-	
-	Super::EndPlay(EndPlayReason);
 }
 
 void ARSFieldItem::OnHit(AActor* Actor)

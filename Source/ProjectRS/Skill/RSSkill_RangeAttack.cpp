@@ -8,7 +8,7 @@
 #include "Common/RSUtil.h"
 #include "Character/RSMonster.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "System/RSActorPoolSubsystem.h"
+#include "System/RSActorSpawnSubsystem.h"
 
 URSSkill_RangeAttack::URSSkill_RangeAttack()
 {
@@ -36,8 +36,8 @@ void URSSkill_RangeAttack::Do(float DeltaTime)
 	if (!World)
 		return;
 
-	URSActorPoolSubsystem* ActorPoolSubsystem = URSActorPoolSubsystem::Get(World);
-	if (!ActorPoolSubsystem)
+	URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(World);
+	if (!ActorSpawnSubsystem)
 		return;
 	
 	AActor* OwnerActor = GetOwnerActor();
@@ -118,9 +118,8 @@ void URSSkill_RangeAttack::Do(float DeltaTime)
 	for (int32 Index = 0; Index < ProjectileSpawnCount; ++Index)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_ProjectileSpawn);
-
-			
-		ARSProjectile* Projectile = Cast<ARSProjectile>(ActorPoolSubsystem->Spawn(ProjectileClass, SpawnLocation, SpawnRotation));
+		
+		ARSProjectile* Projectile = Cast<ARSProjectile>(ActorSpawnSubsystem->Spawn(ProjectileClass, SpawnLocation, SpawnRotation));
 		Projectile->SetCaster(OwnerActor);
 		Projectile->AddIgnoreActor(OwnerActor);
 		Projectile->SetTraceChannel(TraceChannel);

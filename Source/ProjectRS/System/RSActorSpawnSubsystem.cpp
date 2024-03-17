@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSActorPoolSubsystem.h"
-#include "Interface/RSActorPoolInterface.h"
+#include "RSActorSpawnSubsystem.h"
+#include "Interface/RSSpawnInterface.h"
 
-void URSSpawnedActorPool::Activate(AActor* Actor)
+void FRSActorSpawnUtil::Activate(AActor* Actor)
 {
 	if (!IsValid(Actor))
 	{
@@ -27,7 +27,7 @@ void URSSpawnedActorPool::Activate(AActor* Actor)
 	}
 }
 
-void URSSpawnedActorPool::Deactivate(AActor* Actor)
+void FRSActorSpawnUtil::Deactivate(AActor* Actor)
 {
 	if (!IsValid(Actor))
 	{
@@ -50,7 +50,7 @@ void URSSpawnedActorPool::Deactivate(AActor* Actor)
 	}
 }
 
-void URSSpawnedActorPool::BeginPlay(AActor* Actor, const FVector& Location, const FRotator& Rotation)
+void FRSActorSpawnUtil::OnSpawn(AActor* Actor, const FVector& Location, const FRotator& Rotation)
 {
 	if (!IsValid(Actor))
 	{
@@ -59,23 +59,23 @@ void URSSpawnedActorPool::BeginPlay(AActor* Actor, const FVector& Location, cons
 	}
 	
 	Actor->SetActorLocationAndRotation(Location, Rotation);
-	if (IRSActorPoolInterface* ActorPoolInterface = Cast<IRSActorPoolInterface>(Actor))
+	if (IRSSpawnInterface* ActorPoolInterface = Cast<IRSSpawnInterface>(Actor))
 	{
-		ActorPoolInterface->BeginPlayFromPool();
+		ActorPoolInterface->OnSpawn();
 	}
 	
 	TInlineComponentArray<UActorComponent*> Components;
 	Actor->GetComponents(Components);
 	for (UActorComponent* Component : Components)
 	{
-		if (IRSActorPoolInterface* ActorPoolInterface = Cast<IRSActorPoolInterface>(Component))
+		if (IRSSpawnInterface* ActorPoolInterface = Cast<IRSSpawnInterface>(Component))
 		{
-			ActorPoolInterface->BeginPlayFromPool();
+			ActorPoolInterface->OnSpawn();
 		}
 	}
 }
 
-void URSSpawnedActorPool::EndPlay(AActor* Actor)
+void FRSActorSpawnUtil::OnDespawn(AActor* Actor)
 {
 	if (!IsValid(Actor))
 	{
@@ -83,43 +83,43 @@ void URSSpawnedActorPool::EndPlay(AActor* Actor)
 		return;
 	}
 	
-	if (IRSActorPoolInterface* ActorPoolInterface = Cast<IRSActorPoolInterface>(Actor))
+	if (IRSSpawnInterface* ActorPoolInterface = Cast<IRSSpawnInterface>(Actor))
 	{
-		ActorPoolInterface->EndPlayFromPool();
+		ActorPoolInterface->OnDespawn();
 	}
 			
 	TInlineComponentArray<UActorComponent*> Components;
 	Actor->GetComponents(Components);
 	for (UActorComponent* Component : Components)
 	{
-		if (IRSActorPoolInterface* ActorPoolInterface = Cast<IRSActorPoolInterface>(Component))
+		if (IRSSpawnInterface* ActorPoolInterface = Cast<IRSSpawnInterface>(Component))
 		{
-			ActorPoolInterface->EndPlayFromPool();
+			ActorPoolInterface->OnDespawn();
 		}
 	}
 }
 
-URSActorPoolSubsystem* URSActorPoolSubsystem::Get(const UWorld* World)
+URSActorSpawnSubsystem* URSActorSpawnSubsystem::Get(const UWorld* World)
 {
 	if (!World)
 		return nullptr;
 
-	return World->GetSubsystem<URSActorPoolSubsystem>();
+	return World->GetSubsystem<URSActorSpawnSubsystem>();
 }
 
-void URSActorPoolSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+void URSActorSpawnSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	check(!bInitialized);
 	bInitialized = true;
 }
 
-void URSActorPoolSubsystem::Deinitialize()
+void URSActorSpawnSubsystem::Deinitialize()
 {
 	check(bInitialized);
 	bInitialized = false;
 }
 
-void URSActorPoolSubsystem::SetDefaultSize(int32 InitSize, int32 MaxSize, int32 GrowSize)
+void URSActorSpawnSubsystem::SetDefaultSize(int32 InitSize, int32 MaxSize, int32 GrowSize)
 {
 	DefaultInitSize = InitSize;
 	DefaultMaxSize = MaxSize;

@@ -6,8 +6,16 @@
 #include "RSType.h"
 #include "Common/RSUtil.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "RSActorPoolSubsystem.generated.h"
+#include "RSActorSpawnSubsystem.generated.h"
 
+struct FRSActorSpawnUtil
+{
+	static void Activate(AActor* Actor);
+	static void Deactivate(AActor* Actor);
+
+	static void OnSpawn(AActor* Actor, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	static void OnDespawn(AActor* Actor);
+};
 
 UCLASS()
 class PROJECTRS_API URSSpawnedActorPool : public UObject
@@ -15,13 +23,8 @@ class PROJECTRS_API URSSpawnedActorPool : public UObject
 	GENERATED_BODY()
 
 public:
-	static void Activate(AActor* Actor);
-	static void Deactivate(AActor* Actor);
-
-	static void BeginPlay(AActor* Actor, const FVector& SpawnLocation, const FRotator& SpawnRotation);
-	static void EndPlay(AActor* Actor);
 	
-	void InitPool(UWorld* World, UClass* ActorClass, int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void Init(UWorld* World, UClass* ActorClass, int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		if (!World)
 		{
@@ -99,11 +102,8 @@ public:
 		AActor* Actor;
 		if (PoolArray.Num() > 0)
 		{
-			++LiveActorCount;
-			UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Actor Count: %d"), *ActorClass->GetName(), LiveActorCount);
-
 			Actor = PoolArray.Pop();
-			Activate(Actor);
+			FRSActorSpawnUtil::Activate(Actor);
 		}
 		else
 		{
@@ -117,9 +117,11 @@ public:
 			return nullptr;
 		}
 		
-		
 		ensure(Actor->GetClass() == ActorClass);
-		BeginPlay(Actor, SpawnLocation, SpawnRotation);
+		FRSActorSpawnUtil::OnSpawn(Actor, SpawnLocation, SpawnRotation);
+
+		++LiveActorCount;
+		UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Actor Count: %d"), *ActorClass->GetName(), LiveActorCount);
 
 		return Actor;
 	}
@@ -132,20 +134,21 @@ public:
 			return;
 		}
 
-		EndPlay(Actor);
+		FRSActorSpawnUtil::OnDespawn(Actor);
 		
-		if (PoolArray.Num() < MaxSize)
+		--LiveActorCount;
+		UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Actor Count: %d"), *Actor->GetClass()->GetName(), LiveActorCount);
+		
+		if (LiveActorCount < MaxSize)
 		{
-			--LiveActorCount;
-			UE_LOG(LogRS, Verbose, TEXT("%s Pool Live Actor Count: %d"), *Actor->GetClass()->GetName(), LiveActorCount);
-			
-			Deactivate(Actor);
+			FRSActorSpawnUtil::Deactivate(Actor);
 			PoolArray.Push(Actor);
 		}
 		else
 		{
 			Actor->Destroy();
 		}
+		
 	}
 	
 private:
@@ -158,7 +161,7 @@ private:
 			return;
 		}
 		
-		Deactivate(Actor);
+		FRSActorSpawnUtil::Deactivate(Actor);
 		PoolArray.Push(Actor);
 		++SpawnSize;
 	}
@@ -177,12 +180,12 @@ private:
  * 
  */
 UCLASS()
-class PROJECTRS_API URSActorPoolSubsystem : public UWorldSubsystem
+class PROJECTRS_API URSActorSpawnSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	static URSActorPoolSubsystem* Get(const UWorld* World);
+	static URSActorSpawnSubsystem* Get(const UWorld* World);
 	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -210,10 +213,10 @@ public:
 			SpawnedActorPoolMap.Add(ActorClass, NewObject<URSSpawnedActorPool>());
 		}
 		
-		SpawnedActorPoolMap[ActorClass]->InitPool(World, ActorClass, InInitSize, InMaxSize, InGrowSize);
+		SpawnedActorPoolMap[ActorClass]->Init(World, ActorClass, InInitSize, InMaxSize, InGrowSize);
 	}
 	
-	void Reset(const UClass* ActorClass)
+	void ResetPool(const UClass* ActorClass)
 	{
 		if (!ActorClass)
 		{
@@ -230,7 +233,7 @@ public:
 		SpawnedActorPoolMap[ActorClass]->Reset();
 	}
 
-	AActor* Spawn(UClass* ActorClass, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+	AActor* Spawn(UClass* ActorClass, const FVector& SpawnLocation, const FRotator& SpawnRotation, bool bUsePool = true)
 	{
 		UWorld* World = GetWorld();
 		if (!World)
@@ -244,16 +247,30 @@ public:
 			ensure(false);
 			return nullptr;
 		}
-		
-		if (!SpawnedActorPoolMap.Contains(ActorClass))
+
+		AActor* Actor;
+		if (bUsePool)
 		{
-			InitPool(ActorClass, DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
-		}
+			if (!SpawnedActorPoolMap.Contains(ActorClass))
+			{
+				InitPool(ActorClass, DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
+			}
 		
-		return SpawnedActorPoolMap[ActorClass]->Spawn(World, ActorClass, SpawnLocation, SpawnRotation);
+			Actor = SpawnedActorPoolMap[ActorClass]->Spawn(World, ActorClass, SpawnLocation, SpawnRotation);
+		}
+		else
+		{
+			Actor = URSUtil::SpawnActor<AActor>(World, ActorClass, SpawnLocation, SpawnRotation);
+			if (IsValid(Actor))
+			{
+				FRSActorSpawnUtil::OnSpawn(Actor, SpawnLocation, SpawnRotation);
+			}
+		}
+
+		return Actor;
 	}
 
-	void Despawn(AActor* Actor)
+	void Despawn(AActor* Actor, bool bUsePool = true)
 	{
 		if (!IsValid(Actor))
 			return;
@@ -262,18 +279,28 @@ public:
 		if (!ActorClass)
 		{
 			ensure(false);
+			FRSActorSpawnUtil::OnDespawn(Actor);
 			Actor->Destroy();
 			return;
 		}
 		
-		if (!SpawnedActorPoolMap.Contains(ActorClass))
+		if (bUsePool)
 		{
-			ensure(false);
-			Actor->Destroy();
-			return;
+			if (!SpawnedActorPoolMap.Contains(ActorClass))
+			{
+				ensure(false);
+				FRSActorSpawnUtil::OnDespawn(Actor);
+				Actor->Destroy();
+				return;
+			}
+
+			SpawnedActorPoolMap[ActorClass]->Despawn(Actor);
 		}
-		
-		SpawnedActorPoolMap[ActorClass]->Despawn(Actor);
+		else
+		{
+			FRSActorSpawnUtil::OnDespawn(Actor);
+			Actor->Destroy();
+		}
 	}
 	
 private:
@@ -281,7 +308,7 @@ private:
 	TMap<UClass*, TObjectPtr<URSSpawnedActorPool>> SpawnedActorPoolMap;
 
 	int32 DefaultInitSize = 16;
-	int32 DefaultMaxSize = 128;
+	int32 DefaultMaxSize = 256;
 	int32 DefaultGrowSize = 8;
 	bool bInitialized = false;
 };

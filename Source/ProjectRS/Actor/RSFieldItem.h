@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSFieldItem.generated.h"
 
 class UBoxComponent;
@@ -10,7 +11,7 @@ class URSSkillEffect;
 class UPaperFlipbookComponent;
 
 UCLASS()
-class PROJECTRS_API ARSFieldItem : public AActor
+class PROJECTRS_API ARSFieldItem : public AActor, public IRSSpawnInterface
 {
 	GENERATED_BODY()
 	
@@ -18,9 +19,9 @@ public:
 	ARSFieldItem();
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	void OnHit(AActor* Actor);
 

@@ -16,9 +16,9 @@ class PROJECTRS_API ARSAIMonsterController : public ARSAIController
 	
 public:
 	ARSAIMonsterController();
-
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void OnUnPossess() override;
+	
+	void StartAI();
+	void StopAI();
 	
 protected:
 	UFUNCTION()

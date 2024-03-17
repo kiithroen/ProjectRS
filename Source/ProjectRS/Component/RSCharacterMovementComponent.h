@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSCharacterMovementComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class PROJECTRS_API URSCharacterMovementComponent : public UCharacterMovementComponent
+class PROJECTRS_API URSCharacterMovementComponent : public UCharacterMovementComponent, public IRSSpawnInterface
 {
 	GENERATED_BODY()
 
 public:
 	URSCharacterMovementComponent();
+	
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 	
 	FVector GetLastMovementDirection() const { return LastMovementDirection; }
 	
@@ -21,7 +25,6 @@ public:
 	float StartMovementByCurve(UCurveVector* Curve, const FVector& Direction, const FVector& Scale);
 	void StopMovementByCurve();
 
-	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:

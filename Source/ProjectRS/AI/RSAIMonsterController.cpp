@@ -12,17 +12,13 @@ ARSAIMonsterController::ARSAIMonsterController()
 {
 }
 
-void ARSAIMonsterController::OnPossess(APawn* InPawn)
+void ARSAIMonsterController::StartAI()
 {
-	Super::OnPossess(InPawn);
-	
 	GetWorldTimerManager().SetTimer(AITimerHandle, this, &ARSAIMonsterController::OnUpdateAI, 10.f / 60.f, true);
 }
 
-void ARSAIMonsterController::OnUnPossess()
+void ARSAIMonsterController::StopAI()
 {
-	Super::OnUnPossess();
-	
 	ClearAITimer();
 }
 

@@ -8,14 +8,13 @@ URSStatComponent::URSStatComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void URSStatComponent::BeginPlay()
+void URSStatComponent::OnSpawn()
 {
-	Super::BeginPlay();
-	
 }
 
-void URSStatComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void URSStatComponent::OnDespawn()
 {
+	StatValues.Reset();
 	OnStatValueChanged.Clear();
 }
 

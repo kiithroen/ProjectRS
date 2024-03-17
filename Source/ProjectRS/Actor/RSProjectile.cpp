@@ -9,7 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "System/RSActorPoolSubsystem.h"
+#include "System/RSActorSpawnSubsystem.h"
 #include "System/RSAggregatingTickSubsystem.h"
 
 ARSProjectile::ARSProjectile()
@@ -49,11 +49,6 @@ ARSProjectile::ARSProjectile()
 		ProjectileMovementComp->ProjectileGravityScale = 0.0f;
 		ProjectileMovementComp->bSweepCollision = false;
 	}
-}
-
-void ARSProjectile::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void ARSProjectile::Tick(float DeltaTime)
@@ -102,12 +97,7 @@ void ARSProjectile::Tick(float DeltaTime)
 	PrevLocation = GetActorLocation();
 }
 
-void ARSProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-}
-
-void ARSProjectile::BeginPlayFromPool()
+void ARSProjectile::OnSpawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
@@ -115,16 +105,10 @@ void ARSProjectile::BeginPlayFromPool()
 		AggregatingTickSubsystem->RegisterActor(this, TG_PrePhysics);
 	}
 	
-	Caster.Reset();
-	ActorsToIgnore.Reset();
-	TraceChannel = TraceTypeQuery1;
-	HitCount = 0;
-	ExplosionHitCount = 0;
 	PrevLocation = GetActorLocation();
-	ClearExplosionTimer();
 }
 
-void ARSProjectile::EndPlayFromPool()
+void ARSProjectile::OnDespawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
@@ -135,6 +119,13 @@ void ARSProjectile::EndPlayFromPool()
 
 	OnProjectileHit.Clear();
 	OnProjectileExplosion.Clear();
+	
+	Caster.Reset();
+	ActorsToIgnore.Reset();
+	TraceChannel = TraceTypeQuery1;
+	HitCount = 0;
+	ExplosionHitCount = 0;
+	PrevLocation = FVector::ZeroVector;
 }
 
 void ARSProjectile::SetCaster(AActor* InCaster)
@@ -216,9 +207,9 @@ void ARSProjectile::OnExplosion()
 
 	OnProjectileExplosion.Broadcast(this, HitCount);
 
-	if (URSActorPoolSubsystem* ActorPoolSubsystem = URSActorPoolSubsystem::Get(GetWorld()))
+	if (URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(GetWorld()))
 	{
-		ActorPoolSubsystem->Despawn(this);
+		ActorSpawnSubsystem->Despawn(this);
 	}
 }
 

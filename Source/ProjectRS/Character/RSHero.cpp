@@ -6,6 +6,7 @@
 #include "RSCharacterPreset.h"
 #include "Common/RSUtil.h"
 #include "Component/RSHeroMovementComponent.h"
+#include "System/RSActorSpawnSubsystem.h"
 
 ARSHero* ARSHero::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
@@ -22,7 +23,11 @@ ARSHero* ARSHero::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector
 	if (!CharacterClass)
 		return nullptr;
 
-	ARSHero* Hero = URSUtil::SpawnActor<ARSHero>(World, CharacterClass, SpawnLocation, SpawnRotation);
+	URSActorSpawnSubsystem* ActorSpawnSubsystem = URSActorSpawnSubsystem::Get(World);
+	if (!ActorSpawnSubsystem)
+		return nullptr;
+	
+	ARSHero* Hero = Cast<ARSHero>(ActorSpawnSubsystem->Spawn(CharacterClass, SpawnLocation, SpawnRotation, false));
 	if (!IsValid(Hero))
 		return nullptr;
 
@@ -34,6 +39,16 @@ ARSHero* ARSHero::Spawn(UWorld* World, URSCharacterPreset* Preset, const FVector
 ARSHero::ARSHero(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<URSHeroMovementComponent>(CharacterMovementComponentName))
 {
+}
+
+void ARSHero::OnSpawn()
+{
+	Super::OnSpawn();
+}
+
+void ARSHero::OnDespawn()
+{
+	Super::OnSpawn();
 }
 
 void ARSHero::ApplyDamage(float Damage, AActor* Caster)

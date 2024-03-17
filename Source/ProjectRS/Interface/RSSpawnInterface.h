@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RSActorPoolInterface.generated.h"
+#include "RSSpawnInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class URSActorPoolInterface : public UInterface
+class URSSpawnInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,11 +16,11 @@ class URSActorPoolInterface : public UInterface
 /**
  * 
  */
-class PROJECTRS_API IRSActorPoolInterface
+class PROJECTRS_API IRSSpawnInterface
 {
 	GENERATED_BODY()
 
 public:
-	virtual void BeginPlayFromPool() = 0;
-	virtual void EndPlayFromPool() = 0;
+	virtual void OnSpawn() = 0;
+	virtual void OnDespawn() = 0;;
 };

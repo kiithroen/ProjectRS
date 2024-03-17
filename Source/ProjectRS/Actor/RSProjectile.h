@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interface/RSActorPoolInterface.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSProjectile.generated.h"
 
 class URSProjectileMovementComponent;
@@ -15,19 +15,17 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileHit, ARSProjectile*, const T
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRSOnProjectileExplosion, ARSProjectile*, int32);
 
 UCLASS(Abstract)
-class PROJECTRS_API ARSProjectile : public AActor, public IRSActorPoolInterface
+class PROJECTRS_API ARSProjectile : public AActor, public IRSSpawnInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	ARSProjectile();
 
-	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void BeginPlayFromPool() override;
-	virtual void EndPlayFromPool() override;
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
 	
 	void SetCaster(AActor* Caster);
 	AActor* GetCaster() const;

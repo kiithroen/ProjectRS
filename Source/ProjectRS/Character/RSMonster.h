@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/RSCharacter.h"
+#include "Interface/RSSpawnInterface.h"
 #include "RSMonster.generated.h"
 
 /**
@@ -19,12 +20,13 @@ public:
 	
 	ARSMonster(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
-protected:
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	virtual void OnSpawn() override;
+	virtual void OnDespawn() override;
+	
 	virtual void ApplyDamage(float Damage, AActor* Caster) override;
 	virtual void ApplyDie(AActor* Caster) override;
+	
+	virtual void LifeSpanExpired() override;
 	
 	UFUNCTION()
 	void OnHitStopTimeout();
@@ -38,7 +40,9 @@ private:
 	void ClearBuryCorpseTimer();
 
 	void StartBuryCorpse();
-	
+
 	FTimerHandle HitStopTimerHandle;
 	FTimerHandle BuryCorpseTimerHandle;
+
+	FVector SavedMeshRelativeLocation;
 };

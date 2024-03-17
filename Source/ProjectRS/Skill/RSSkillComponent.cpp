@@ -12,19 +12,16 @@ URSSkillComponent::URSSkillComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void URSSkillComponent::BeginPlay()
+void URSSkillComponent::OnSpawn()
 {
-	Super::BeginPlay();
-
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
 		PrimaryComponentTick.UnRegisterTickFunction();
 		AggregatingTickSubsystem->RegisterComponent(this, TG_DuringPhysics);
 	}
-	
 }
 
-void URSSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void URSSkillComponent::OnDespawn()
 {
 	if (URSAggregatingTickSubsystem* AggregatingTickSubsystem = URSAggregatingTickSubsystem::Get(GetWorld()))
 	{
@@ -33,8 +30,12 @@ void URSSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	OnFlagAdded.Clear();
 	OnFlagRemoved.Clear();
-	
-	Super::EndPlay(EndPlayReason);
+
+	Skills.Reset();
+	ActiveSkillEffects.Reset();
+	PendingSkillEffects.Reset();
+	ExpiredSkillEffects.Reset();
+	Flags = FGameplayTagContainer::EmptyContainer;
 }
 
 void URSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

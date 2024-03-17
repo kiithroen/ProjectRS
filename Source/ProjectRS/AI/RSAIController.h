@@ -18,10 +18,4 @@ class PROJECTRS_API ARSAIController : public AAIController
 	
 public:
 	ARSAIController();
-
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void OnUnPossess() override;
 };
