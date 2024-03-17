@@ -47,12 +47,12 @@ public:
 			return nullptr;
 		}
 		
-		FActorSpawnParameters SpawnParms;
-		SpawnParms.bNoFail = true;
-		SpawnParms.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParms.ObjectFlags |= RF_Transient;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.ObjectFlags |= RF_Transient;
 
-		return World->SpawnActor<T>(Class, SpawnLocation, SpawnRotation, SpawnParms);
+		return World->SpawnActor<T>(Class, SpawnLocation, SpawnRotation, SpawnParams);
 	}
 
 	static FOverlapResult FindClosestOverlap(const TArray<FOverlapResult>& OverlapResults, const FVector& Location, float MaxDistance, TFunctionRef<bool(const AActor*)> Filter)

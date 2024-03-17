@@ -79,11 +79,11 @@ void URSAggregatingTickSubsystem::RegisterActor(AActor* Actor, ETickingGroup Tic
 	
 	if (!ActorCollectionTickFunctionMap.Contains(ActorClass))
 	{
-		TSharedPtr<FRSActorCollectionTickFunction> ActorCollectionTickFucntion = MakeShareable(new FRSActorCollectionTickFunction);
-		ActorCollectionTickFucntion->TickGroup = TickGroup;
+		TSharedPtr<FRSActorCollectionTickFunction> ActorCollectionTickFunction = MakeShareable(new FRSActorCollectionTickFunction);
+		ActorCollectionTickFunction->TickGroup = TickGroup;
 		
-		ActorCollectionTickFucntion->RegisterTickFunction(Actor->GetLevel());
-		ActorCollectionTickFunctionMap.Add(ActorClass, ActorCollectionTickFucntion);
+		ActorCollectionTickFunction->RegisterTickFunction(Actor->GetLevel());
+		ActorCollectionTickFunctionMap.Add(ActorClass, ActorCollectionTickFunction);
 	}
 	
 	ActorCollectionTickFunctionMap[ActorClass]->AddActor(Actor);
@@ -118,10 +118,10 @@ void URSAggregatingTickSubsystem::RegisterComponent(UActorComponent* ActorCompon
 	
 	if (!ComponentCollectionTickFunctionMap.Contains(ActorComponentClass))
 	{
-		TSharedPtr<FRSComponentCollectionTickFunction> ComponentCollectionTickFucntion = MakeShareable(new FRSComponentCollectionTickFunction);
-		ComponentCollectionTickFucntion->TickGroup = TickGroup;
-		ComponentCollectionTickFucntion->RegisterTickFunction(ActorComponent->GetComponentLevel());
-		ComponentCollectionTickFunctionMap.Add(ActorComponentClass, ComponentCollectionTickFucntion);
+		TSharedPtr<FRSComponentCollectionTickFunction> ComponentCollectionTickFunction = MakeShareable(new FRSComponentCollectionTickFunction);
+		ComponentCollectionTickFunction->TickGroup = TickGroup;
+		ComponentCollectionTickFunction->RegisterTickFunction(ActorComponent->GetComponentLevel());
+		ComponentCollectionTickFunctionMap.Add(ActorComponentClass, ComponentCollectionTickFunction);
 	}
 	
 	ComponentCollectionTickFunctionMap[ActorComponentClass]->AddComponent(ActorComponent);

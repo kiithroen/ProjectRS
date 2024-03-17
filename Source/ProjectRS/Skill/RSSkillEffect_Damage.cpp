@@ -2,12 +2,8 @@
 
 
 #include "Skill/RSSkillEffect_Damage.h"
-#include "Component/RSStatComponent.h"
-#include "Skill/RSSkillComponent.h"
 #include "Character/RSCharacter.h"
 #include "Common/RSUtil.h"
-#include "GameFramework/RSAssetManager.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "System/RSObjectPoolSubsystem.h"
 
 URSSkillEffect* URSSkillEffect_Damage::Clone() const

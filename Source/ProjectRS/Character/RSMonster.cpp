@@ -109,7 +109,7 @@ void ARSMonster::ApplyDie(AActor* Caster)
 	FTimerHandle TimerHandle;;
 	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
 	{
-		StartBuryCoprse();
+		StartBuryCorpse();
 	}), 3.f, false);
 	
 	PlayHitStop();
@@ -152,15 +152,15 @@ void ARSMonster::OnHitStopTimeout()
 	ClearHitStopTimer();
 }
 
-void ARSMonster::StartBuryCoprse()
+void ARSMonster::StartBuryCorpse()
 {
 	SetLifeSpan(2.f);
 
 	ClearBuryCorpseTimer();
-	GetWorldTimerManager().SetTimer(BuryCorpseTimerHandle, this, &ARSMonster::OnUpdateBuryCoprse, 0.1f, true);
+	GetWorldTimerManager().SetTimer(BuryCorpseTimerHandle, this, &ARSMonster::OnUpdateBuryCorpse, 0.1f, true);
 }
 
-void ARSMonster::OnUpdateBuryCoprse()
+void ARSMonster::OnUpdateBuryCorpse()
 {
 	const float DeltaTime = GetWorldTimerManager().GetTimerRate(BuryCorpseTimerHandle);
 	if (USkeletalMeshComponent* MeshComp = GetMesh())

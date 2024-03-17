@@ -30,14 +30,14 @@ protected:
 	void OnHitStopTimeout();
 	
 	UFUNCTION()
-	void OnUpdateBuryCoprse();
+	void OnUpdateBuryCorpse();
 	
 private:
 	void PlayHitStop();
 	void ClearHitStopTimer();
 	void ClearBuryCorpseTimer();
 
-	void StartBuryCoprse();
+	void StartBuryCorpse();
 	
 	FTimerHandle HitStopTimerHandle;
 	FTimerHandle BuryCorpseTimerHandle;

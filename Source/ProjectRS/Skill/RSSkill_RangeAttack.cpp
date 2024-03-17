@@ -7,8 +7,6 @@
 #include "RSType.h"
 #include "Common/RSUtil.h"
 #include "Character/RSMonster.h"
-#include "Algo/RandomShuffle.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "System/RSActorPoolSubsystem.h"
 

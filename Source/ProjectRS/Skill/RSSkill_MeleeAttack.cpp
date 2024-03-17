@@ -2,13 +2,10 @@
 
 
 #include "RSSkill_MeleeAttack.h"
-#include "Actor/RSProjectile.h"
 #include "Skill/RSSkillEffect.h"
 #include "RSType.h"
 #include "Common/RSUtil.h"
 #include "Character/RSMonster.h"
-#include "Algo/RandomShuffle.h"
-#include "Kismet/KismetMathLibrary.h"
 
 URSSkill_MeleeAttack::URSSkill_MeleeAttack()
 {
@@ -34,7 +31,7 @@ void URSSkill_MeleeAttack::OnBegin()
 	{
 		if (UAnimMontage* Montage = MontageToPlay.LoadSynchronous())
 		{
-			OwnerAnim->PlayMontageWithEnd(Montage, [OwnerAnim, this](UAnimMontage*,bool)
+			OwnerAnim->PlayMontageWithEnd(Montage, [this](UAnimMontage*,bool)
 			{
 				EndSkill();
 			});

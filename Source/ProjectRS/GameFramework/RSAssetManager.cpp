@@ -5,7 +5,6 @@
 
 #include "Data/RSGlobalData.h"
 #include "Setting/RSGameSetting.h"
-#include "Skill/RSSkillEffect_Damage.h"
 
 const FPrimaryAssetType	URSAssetManager::FieldItemType = TEXT("RSFieldItemData");
 const FPrimaryAssetType	URSAssetManager::UsableItemType = TEXT("RSUsableItemData");
