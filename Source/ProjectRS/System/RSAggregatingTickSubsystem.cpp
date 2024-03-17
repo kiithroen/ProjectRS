@@ -4,7 +4,7 @@
 #include "RSAggregatingTickSubsystem.h"
 
 
-void FRSActorCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
+void FRSActorCollectionTickFunction::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
 {
 	for (auto& Actor : ExpiredTickingActors)
 	{
@@ -26,7 +26,7 @@ void FRSActorCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick Tic
 	}
 }
 
-void FRSComponentCollectionTickFucntion::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
+void FRSComponentCollectionTickFunction::ExecuteTick(float DeltaTime, ELevelTick TickType, ENamedThreads::Type CurrentThread, const FGraphEventRef& MyCompletionGraphEvent)
 {
 	for (auto& Component : ExpiredTickingComponents)
 	{
@@ -71,7 +71,7 @@ void URSAggregatingTickSubsystem::RegisterActor(AActor* Actor, ETickingGroup Tic
 	
 	if (!ActorCollectionTickFunctionMap.Contains(ActorClass))
 	{
-		TSharedPtr<FRSActorCollectionTickFucntion> ActorCollectionTickFucntion = MakeShareable(new FRSActorCollectionTickFucntion);
+		TSharedPtr<FRSActorCollectionTickFunction> ActorCollectionTickFucntion = MakeShareable(new FRSActorCollectionTickFunction);
 		ActorCollectionTickFucntion->TickGroup = TickGroup;
 		
 		ActorCollectionTickFucntion->RegisterTickFunction(Actor->GetLevel());
@@ -110,7 +110,7 @@ void URSAggregatingTickSubsystem::RegisterComponent(UActorComponent* ActorCompon
 	
 	if (!ComponentCollectionTickFunctionMap.Contains(ActorComponentClass))
 	{
-		TSharedPtr<FRSComponentCollectionTickFucntion> ComponentCollectionTickFucntion = MakeShareable(new FRSComponentCollectionTickFucntion);
+		TSharedPtr<FRSComponentCollectionTickFunction> ComponentCollectionTickFucntion = MakeShareable(new FRSComponentCollectionTickFunction);
 		ComponentCollectionTickFucntion->TickGroup = TickGroup;
 		ComponentCollectionTickFucntion->RegisterTickFunction(ActorComponent->GetComponentLevel());
 		ComponentCollectionTickFunctionMap.Add(ActorComponentClass, ComponentCollectionTickFucntion);

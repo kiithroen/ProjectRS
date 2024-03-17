@@ -88,8 +88,6 @@ public:
 	}
 	
 	URSGlobalData* GetOrLoadGlobalData();
-	URSObjectPool& GetObjectPool();
-	void InitObjectPool();
 
 	void OnInitGameInstance();
 
@@ -101,7 +99,4 @@ private:
 	
 	UPROPERTY(Transient)
 	TMap<FName, TObjectPtr<UDataTable>> GlobalDataTables;
-
-	UPROPERTY(Transient)
-	TObjectPtr<URSObjectPool> ObjectPool;
 };

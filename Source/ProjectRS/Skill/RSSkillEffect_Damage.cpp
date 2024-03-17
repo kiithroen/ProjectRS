@@ -5,14 +5,14 @@
 #include "Component/RSStatComponent.h"
 #include "Skill/RSSkillComponent.h"
 #include "Character/RSCharacter.h"
-#include "Common/RSObjectPool.h"
 #include "Common/RSUtil.h"
 #include "GameFramework/RSAssetManager.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "System/RSObjectPoolSubsystem.h"
 
 URSSkillEffect* URSSkillEffect_Damage::Clone() const
 {
-	if (URSSkillEffect_Damage* CloneSkillEffect = URSAssetManager::Get().GetObjectPool().Pop<URSSkillEffect_Damage>())
+	if (URSSkillEffect_Damage* CloneSkillEffect = URSObjectPoolSubsystem::Get().Pop<URSSkillEffect_Damage>())
 	{
 		CloneSkillEffect->CopyFrom(this);
 		return CloneSkillEffect;
@@ -24,7 +24,7 @@ URSSkillEffect* URSSkillEffect_Damage::Clone() const
 
 void URSSkillEffect_Damage::Release()
 {
-	URSAssetManager::Get().GetObjectPool().Push<URSSkillEffect_Damage>(this);
+	URSObjectPoolSubsystem::Get().Push<URSSkillEffect_Damage>(this);
 }
 
 void URSSkillEffect_Damage::CopyFrom(const URSSkillEffect* Other)

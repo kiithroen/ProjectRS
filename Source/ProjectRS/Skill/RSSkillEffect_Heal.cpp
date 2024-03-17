@@ -6,13 +6,13 @@
 #include "Skill/RSSkillComponent.h"
 #include "RSType.h"
 #include "Character/RSCharacter.h"
-#include "Common/RSObjectPool.h"
 #include "Common/RSUtil.h"
 #include "GameFramework/RSAssetManager.h"
+#include "System/RSObjectPoolSubsystem.h"
 
 URSSkillEffect* URSSkillEffect_Heal::Clone() const
 {
-	if (URSSkillEffect_Heal* CloneSkillEffect = URSAssetManager::Get().GetObjectPool().Pop<URSSkillEffect_Heal>())
+	if (URSSkillEffect_Heal* CloneSkillEffect = URSObjectPoolSubsystem::Get().Pop<URSSkillEffect_Heal>())
 	{
 		CloneSkillEffect->CopyFrom(this);
 		return CloneSkillEffect;
@@ -24,7 +24,7 @@ URSSkillEffect* URSSkillEffect_Heal::Clone() const
 
 void URSSkillEffect_Heal::Release()
 {
-	URSAssetManager::Get().GetObjectPool().Push<URSSkillEffect_Heal>(this);
+	URSObjectPoolSubsystem::Get().Push<URSSkillEffect_Heal>(this);
 }
 
 void URSSkillEffect_Heal::CopyFrom(const URSSkillEffect* Other)

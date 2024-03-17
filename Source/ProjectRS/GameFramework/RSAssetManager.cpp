@@ -3,7 +3,6 @@
 
 #include "GameFramework/RSAssetManager.h"
 
-#include "Common/RSObjectPool.h"
 #include "Data/RSGlobalData.h"
 #include "Setting/RSGameSetting.h"
 #include "Skill/RSSkillEffect_Damage.h"
@@ -25,7 +24,7 @@ URSAssetManager& URSAssetManager::Get()
 		return *Singleton;
 	}
 
-	ensure(false);
+	check(false);
 
 	return *NewObject<URSAssetManager>();
 }
@@ -61,22 +60,7 @@ URSGlobalData* URSAssetManager::GetOrLoadGlobalData()
 	return GlobalData;
 }
 
-URSObjectPool& URSAssetManager::GetObjectPool()
-{
-	ensure(ObjectPool);
-	return *ObjectPool;
-}
-
-void URSAssetManager::InitObjectPool()
-{
-	ObjectPool = NewObject<URSObjectPool>();
-	ObjectPool->SetDefaultSize(4, 16, 2);
-	ObjectPool->Initialize<URSSkillEffect_Damage>(8, 64, 4);
-}
-
 void URSAssetManager::OnInitGameInstance()
 {
 	LoadGlobalData();
-
-	InitObjectPool();
 }

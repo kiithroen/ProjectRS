@@ -3,13 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Subsystems/EngineSubsystem.h"
 #include "RSType.h"
-#include "UObject/Object.h"
-#include "RSObjectPool.generated.h"
+#include "RSObjectPoolSubsystem.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJECTRS_API URSInstancedObjectPool : public UObject
 {
@@ -17,7 +14,7 @@ class PROJECTRS_API URSInstancedObjectPool : public UObject
 
 public:
 	template <typename T>
-	void Initialize(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void CreatePool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		ensure(InInitSize <= InMaxSize);
 		ensure(InInitSize > 0);
@@ -40,7 +37,7 @@ public:
 			*T::StaticClass()->GetName(), InitSize, MaxSize, GrowSize);
 	}
 	
-	void Deinitialize()
+	void Reset()
 	{
 		InitSize = 0;
 		MaxSize = 0;
@@ -126,21 +123,26 @@ private:
 	int32 LiveObjectCount = 0;
 };
 
+/**
+ * 
+ */
 UCLASS()
-class PROJECTRS_API URSObjectPool : public UObject
+class PROJECTRS_API URSObjectPoolSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	void SetDefaultSize(int32 InitSize, int32 MaxSize, int32 GrowSize)
-	{
-		DefaultInitSize = InitSize;
-		DefaultMaxSize = MaxSize;
-		DefaultGrowSize = GrowSize;
-	}
+	static URSObjectPoolSubsystem& Get();
 	
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+	
+	bool IsInitialized() const { return bInitialized; }
+
+	void SetDefaultSize(int32 InitSize, int32 MaxSize, int32 GrowSize);
+
 	template <typename T>
-	void Initialize(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
+	void CreatePool(int32 InInitSize, int32 InMaxSize, int32 InGrowSize)
 	{
 		UClass* ObjectClass = T::StaticClass();
 		if (!ObjectClass)
@@ -154,11 +156,11 @@ public:
 			InstancedObjectPoolMap.Add(ObjectClass, NewObject<URSInstancedObjectPool>());
 		}
 		
-		InstancedObjectPoolMap[ObjectClass]->Initialize<T>(InInitSize, InMaxSize, InGrowSize);
+		InstancedObjectPoolMap[ObjectClass]->CreatePool<T>(InInitSize, InMaxSize, InGrowSize);
 	}
 	
 	template <typename T>
-	void Deinitialize()
+	void Reset()
 	{
 		const UClass* ObjectClass = T::StaticClass();
 		if (!ObjectClass)
@@ -173,7 +175,7 @@ public:
 			return;
 		}
 		
-		InstancedObjectPoolMap[ObjectClass]->Deinitialize();
+		InstancedObjectPoolMap[ObjectClass]->Reset();
 	}
 
 	template <typename T>
@@ -188,7 +190,7 @@ public:
 		
 		if (!InstancedObjectPoolMap.Contains(ObjectClass))
 		{
-			Initialize<T>(DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
+			CreatePool<T>(DefaultInitSize, DefaultMaxSize, DefaultGrowSize);
 		}
 		
 		return InstancedObjectPoolMap[ObjectClass]->Pop<T>();
@@ -220,4 +222,5 @@ private:
 	int32 DefaultInitSize = 8;
 	int32 DefaultMaxSize = 32;
 	int32 DefaultGrowSize = 4;
+	bool bInitialized = false;
 };

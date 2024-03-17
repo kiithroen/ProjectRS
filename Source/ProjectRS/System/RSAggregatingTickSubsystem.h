@@ -7,11 +7,11 @@
 #include "RSAggregatingTickSubsystem.generated.h"
 
 USTRUCT()
-struct FRSActorCollectionTickFucntion : public FTickFunction
+struct FRSActorCollectionTickFunction : public FTickFunction
 {
 	GENERATED_BODY()
 
-	FRSActorCollectionTickFucntion() {}
+	FRSActorCollectionTickFunction() {}
 	
 	void AddActor(AActor* AActor)
 	{
@@ -31,7 +31,7 @@ struct FRSActorCollectionTickFucntion : public FTickFunction
 };
 
 template<>
-struct TStructOpsTypeTraits<FRSActorCollectionTickFucntion> : public TStructOpsTypeTraitsBase2<FRSActorCollectionTickFucntion>
+struct TStructOpsTypeTraits<FRSActorCollectionTickFunction> : public TStructOpsTypeTraitsBase2<FRSActorCollectionTickFunction>
 {
 	enum
 	{
@@ -41,11 +41,11 @@ struct TStructOpsTypeTraits<FRSActorCollectionTickFucntion> : public TStructOpsT
 
 
 USTRUCT()
-struct FRSComponentCollectionTickFucntion : public FTickFunction
+struct FRSComponentCollectionTickFunction : public FTickFunction
 {
 	GENERATED_BODY()
 
-	FRSComponentCollectionTickFucntion() {}
+	FRSComponentCollectionTickFunction() {}
 	
 	void AddComponent(UActorComponent* ActorComponent)
 	{
@@ -65,7 +65,7 @@ struct FRSComponentCollectionTickFucntion : public FTickFunction
 };
 
 template<>
-struct TStructOpsTypeTraits<FRSComponentCollectionTickFucntion> : public TStructOpsTypeTraitsBase2<FRSComponentCollectionTickFucntion>
+struct TStructOpsTypeTraits<FRSComponentCollectionTickFunction> : public TStructOpsTypeTraitsBase2<FRSComponentCollectionTickFunction>
 {
 	enum
 	{
@@ -94,7 +94,7 @@ public:
 	void UnRegisterComponent(UActorComponent* ActorComponent);
 
 private:
-	TMap<UClass*, TSharedPtr<FRSActorCollectionTickFucntion>> ActorCollectionTickFunctionMap;
-	TMap<UClass*, TSharedPtr<FRSComponentCollectionTickFucntion>> ComponentCollectionTickFunctionMap;
+	TMap<UClass*, TSharedPtr<FRSActorCollectionTickFunction>> ActorCollectionTickFunctionMap;
+	TMap<UClass*, TSharedPtr<FRSComponentCollectionTickFunction>> ComponentCollectionTickFunctionMap;
 	bool bInitialized = false;
 };
