@@ -166,13 +166,13 @@ TArray<URSSkill*> URSSkillComponent::FindSkillsByTypeTagsAll(const FGameplayTagC
 	return MoveTemp(Results);
 }
 
-bool URSSkillComponent::CanActivateSkill(const FGameplayTag& Id) const
+bool URSSkillComponent::CanCastSkill(const FGameplayTag& Id) const
 {
 	const URSSkill* Skill = FindSkill(Id);
 	if (!Skill)
 		return false;
 
-	return Skill->CanActivate();
+	return Skill->CanCast();
 }
 
 bool URSSkillComponent::TryCastSkill(const FGameplayTag& Id)
@@ -181,7 +181,7 @@ bool URSSkillComponent::TryCastSkill(const FGameplayTag& Id)
 	if (!Skill)
 		return false;
 
-	if (!Skill->CanActivate())
+	if (!Skill->CanCast())
 		return false;
 
 	Skill->OnBegin();
@@ -302,10 +302,15 @@ URSSkillEffect* URSSkillComponent::AddSkillEffect(const URSSkillEffect* SkillEff
 				// Repeat, Infinite
 				if (OldSkillEffectInSameStackGroup->GetExecutionType() != ERSSkillEffectExecutionType::Once)
 				{
-					if (OldSkillEffectInSameStackGroup->GetGrade() > SkillEffect->GetGrade())
+					if (OldSkillEffectInSameStackGroup->GetGrade() >= SkillEffect->GetGrade())
 					{
 						// ignore
 						return nullptr;
+					}
+					else
+					{
+						// overwrite
+						RemoveSkillEffect(OldSkillEffectInSameStackGroup);
 					}
 				}
 			}

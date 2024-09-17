@@ -20,7 +20,7 @@ public:
 	
 	virtual UWorld* GetWorld() const override;
 	
-	virtual bool CanActivate() const;
+	virtual bool CanCast() const;
 	virtual void Do(float DeltaTime);
 	virtual void OnBegin();
 	virtual void OnEnd();

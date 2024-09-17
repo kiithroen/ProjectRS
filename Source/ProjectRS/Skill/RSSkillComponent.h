@@ -40,7 +40,7 @@ public:
 	
 	bool TryCastSkill(const FGameplayTag& Id);
 	void StopSkill(const FGameplayTag& Id);
-	bool CanActivateSkill(const FGameplayTag& Id) const;
+	bool CanCastSkill(const FGameplayTag& Id) const;
 	
 	void SendEvent(const FGameplayTag& EventTag);
 	

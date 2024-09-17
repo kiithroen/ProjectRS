@@ -22,7 +22,7 @@ UWorld* URSSkill::GetWorld() const
 	return nullptr;
 }
 
-bool URSSkill::CanActivate() const
+bool URSSkill::CanCast() const
 {
 	if (Level < RequiredLevel)
 		return false;
